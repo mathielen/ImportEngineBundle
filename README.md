@@ -1,7 +1,7 @@
 Mathielen Import Engine Bundle
 ==========================
 
-[![Build Status](https://travis-ci.org/mathielen/import-engine-bundle.png?branch=master)](https://travis-ci.org/mathielen/import-engine-bundle)
+[![Build Status](https://travis-ci.org/mathielen/ImportEngineBundle.png?branch=master)](https://travis-ci.org/mathielen/ImportEngineBundle)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mathielen/ImportEngineBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mathielen/ImportEngineBundle/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/mathielen/ImportEngineBundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/mathielen/ImportEngineBundle/?branch=master)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/16f2af0e-9318-47f7-bd12-d3f07caf1d21/mini.png)](https://insight.sensiolabs.com/projects/16f2af0e-9318-47f7-bd12-d3f07caf1d21)
