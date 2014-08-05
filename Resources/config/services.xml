@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+	<services>
+
+		<service id="mathielen_importengine.importer.format_discoverer" class="Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy">
+		</service>
+
+		<service id="mathielen_importengine.importer.repository" class="Mathielen\ImportEngine\Importer\ImporterRepository" public="false">
+		</service>
+
+        <service id="mathielen_importengine.import.storagelocator" class="Mathielen\ImportEngine\Storage\StorageLocator">
+        </service>
+
+        <service id="mathielen_importengine.import.builder" class="Mathielen\ImportEngine\Import\ImportBuilder">
+            <argument type="service" id="mathielen_importengine.importer.repository" />
+            <argument type="service" id="mathielen_importengine.import.storagelocator" />
+            <argument type="service" id="event_dispatcher" />
+        </service>
+
+        <service id="mathielen_importengine.import.runner" class="Mathielen\ImportEngine\Import\Run\ImportRunner">
+            <argument type="service">
+                <service  class="Mathielen\ImportEngine\Import\Workflow\DefaultWorkflowFactory">
+                    <argument type="service" id="event_dispatcher" />
+                </service>
+            </argument>
+        </service>
+
+	</services>
+
+</container>
