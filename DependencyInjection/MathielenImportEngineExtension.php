@@ -58,7 +58,7 @@ class MathielenImportEngineExtension extends Extension
                 new Reference('jms_serializer')));
         }
 
-        //TODO default
+        return new Definition('Mathielen\DataImport\Writer\ObjectWriter\DefaultObjectFactory', array($config['class']));
     }
 
     /**
