@@ -1,0 +1,7 @@
+mathielen_import_engine:
+    importers:
+        minimum_importer:
+            target:
+                type: file
+                uri: /tmp/myfile.csv
+                format: csv

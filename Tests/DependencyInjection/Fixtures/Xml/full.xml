@@ -1,0 +1,54 @@
+<container
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:mathielen_import_engine="http://example.org/schema/dic/mathielen_import_engine"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+        <mathielen_import_engine:config>
+            <mathielen_import_engine:storageprovider name="upload">
+                <mathielen_import_engine:type>upload</mathielen_import_engine:type>
+                <mathielen_import_engine:path>/tmp/uploaddir</mathielen_import_engine:path>
+            </mathielen_import_engine:storageprovider>
+            <mathielen_import_engine:storageprovider name="local">
+                <mathielen_import_engine:type>directory</mathielen_import_engine:type>
+                <mathielen_import_engine:path>/tmp/cached</mathielen_import_engine:path>
+            </mathielen_import_engine:storageprovider>
+            <mathielen_import_engine:storageprovider name="doctrine">
+                <mathielen_import_engine:type>doctrine</mathielen_import_engine:type>
+            </mathielen_import_engine:storageprovider>
+
+            <mathielen_import_engine:importer name="maximum_importer">
+                <mathielen_import_engine:preconditions>
+                    <mathielen_import_engine:format>excel</mathielen_import_engine:format>
+                    <mathielen_import_engine:format>csv</mathielen_import_engine:format>
+                    <mathielen_import_engine:fieldcount>2</mathielen_import_engine:fieldcount>
+                    <mathielen_import_engine:field>regexp1</mathielen_import_engine:field>
+                    <mathielen_import_engine:field>regexp2</mathielen_import_engine:field>
+                    <mathielen_import_engine:fieldset>regexp1</mathielen_import_engine:fieldset>
+                    <mathielen_import_engine:fieldset>regexp2</mathielen_import_engine:fieldset>
+                    <mathielen_import_engine:filename>regexp1</mathielen_import_engine:filename>
+                    <mathielen_import_engine:filename>regexp2</mathielen_import_engine:filename>
+                </mathielen_import_engine:preconditions>
+                <mathielen_import_engine:object_factory type="jms_serializer" class="Acme\DemoBundle\ValueObject\MyImportedRow" />
+                <mathielen_import_engine:validation>
+                    <mathielen_import_engine:source>sourceconstraint1</mathielen_import_engine:source>
+                    <mathielen_import_engine:source>sourceconstraint2</mathielen_import_engine:source>
+                    <mathielen_import_engine:target>targetconstraint1</mathielen_import_engine:target>
+                    <mathielen_import_engine:target>targetconstraint2</mathielen_import_engine:target>
+                </mathielen_import_engine:validation>
+                <mathielen_import_engine:target type="service" service="import_service" method="processImportRow" />
+            </mathielen_import_engine:importer>
+            <mathielen_import_engine:importer name="doctrine_importer">
+                <mathielen_import_engine:preconditions>
+                    <mathielen_import_engine:format>excel</mathielen_import_engine:format>
+                    <mathielen_import_engine:filename>regexp1</mathielen_import_engine:filename>
+                </mathielen_import_engine:preconditions>
+                <mathielen_import_engine:object_factory type="default" class="Acme\DemoBundle\ValueObject\MyImportedRow" />
+                <mathielen_import_engine:source type="file" uri="/tmp/import.csv" format="csv" />
+                <mathielen_import_engine:validation target="true" />
+                <mathielen_import_engine:target type="doctrine" />
+            </mathielen_import_engine:importer>
+
+        </mathielen_import_engine:config>
+
+</container>

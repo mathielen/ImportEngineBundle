@@ -1,0 +1,51 @@
+mathielen_import_engine:
+    storageprovider:
+        upload:
+            type: upload
+            path: /tmp/uploaddir
+        local:
+            type: directory
+            path: /tmp/cached
+        doctrine:
+            type: doctrine
+    importers:
+        maximum_importer:
+            preconditions:
+                format: ['excel', 'csv']
+                fieldcount: 2
+                fields:
+                    - 'header2'
+                    - 'header1'
+                fieldset:
+                    - 'header1'
+                    - 'header2'
+                filename: ['regexp1', 'regexp2']
+            object_factory:
+                type: jms_serializer
+                class: Acme\DemoBundle\ValueObject\MyImportedRow
+            validation:
+                source:
+                    - sourceconstraint1
+                    - sourceconstraint2
+                target:
+                    - targetconstraint1
+                    - targetconstraint2
+            target:
+                type: service
+                service: import_service
+                method: processImportRow
+        doctrine_importer:
+            preconditions:
+                format: excel
+                filename: regexp1
+            object_factory:
+                type: default
+                class: Acme\DemoBundle\Entity\MyImportedRow
+            source:
+                type: file
+                uri: /tmp/import.csv
+                format: csv
+            validation:
+                target: true
+            target:
+                type: doctrine

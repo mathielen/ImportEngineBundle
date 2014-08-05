@@ -3,7 +3,7 @@ namespace Mathielen\ImportEngineBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
@@ -13,22 +13,21 @@ class MathielenImportEngineExtension extends Extension
 
     public function load(array $configs, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-        $loader->load('services.xml');
+        $config = $this->processConfiguration(new Configuration(), $configs);
 
-        $this->parseConfig($configs[0], $container);
+        if (!empty($config['importers'])) {
+            $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+            $loader->load('services.xml');
+
+            $this->parseConfig($config, $container);
+        }
     }
 
     private function parseConfig(array $config, ContainerBuilder $container)
     {
         $storageLocatorDef = $container->findDefinition('mathielen_importengine.import.storagelocator');
-        if (array_key_exists('storageprovider', $config)) {
-            $this->addStorageProviderDef($storageLocatorDef, $config['storageprovider']);
-        } elseif (array_key_exists('storageproviders', $config)) {
-            //multiple
-            foreach ($config['storageproviders'] as $sourceConfig) {
-                $this->addStorageProviderDef($storageLocatorDef, $sourceConfig);
-            }
+        foreach ($config['storageprovider'] as $sourceConfig) {
+            $this->addStorageProviderDef($storageLocatorDef, $sourceConfig);
         }
 
         $importerRepositoryDef = $container->findDefinition('mathielen_importengine.importer.repository');
@@ -38,6 +37,7 @@ class MathielenImportEngineExtension extends Extension
                 $finderDef = $this->generateFinderDef($importConfig['preconditions']);
             }
 
+            $objectFactoryDef = null;
             if (array_key_exists('object_factory', $importConfig)) {
                 $objectFactoryDef = $this->generateObjectFactoryDef($importConfig['object_factory']);
             }
@@ -69,17 +69,13 @@ class MathielenImportEngineExtension extends Extension
         $finderDef = new Definition('Mathielen\ImportEngine\Importer\ImporterPrecondition');
 
         if (array_key_exists('filename', $finderConfig)) {
-            $finderDef->addMethodCall('filename', array($finderConfig['filename']));
-        } elseif (array_key_exists('filenames', $finderConfig)) {
-            foreach ($finderConfig['filenames'] as $conf) {
+            foreach ($finderConfig['filename'] as $conf) {
                 $finderDef->addMethodCall('filename', array($conf));
             }
         }
 
         if (array_key_exists('format', $finderConfig)) {
-            $finderDef->addMethodCall('format', array($finderConfig['format']));
-        } elseif (array_key_exists('formats', $finderConfig)) {
-            foreach ($finderConfig['formats'] as $conf) {
+            foreach ($finderConfig['format'] as $conf) {
                 $finderDef->addMethodCall('format', array($conf));
             }
         }
@@ -88,9 +84,7 @@ class MathielenImportEngineExtension extends Extension
             $finderDef->addMethodCall('fieldcount', array($finderConfig['fieldcount']));
         }
 
-        if (array_key_exists('field', $finderConfig)) {
-            $finderDef->addMethodCall('field', array($finderConfig['field']));
-        } elseif (array_key_exists('fields', $finderConfig)) {
+        if (array_key_exists('fields', $finderConfig)) {
             foreach ($finderConfig['fields'] as $conf) {
                 $finderDef->addMethodCall('field', array($conf));
             }
@@ -106,7 +100,7 @@ class MathielenImportEngineExtension extends Extension
     /**
      * @return \Symfony\Component\DependencyInjection\Definition
      */
-    private function generateImporterDef(array $importConfig, Definition $objectFactoryDef)
+    private function generateImporterDef(array $importConfig, Definition $objectFactoryDef=null)
     {
         $importerDef = new Definition('Mathielen\ImportEngine\Importer\Importer', array(
             $this->getStorageDef($importConfig['target'], $objectFactoryDef)
@@ -117,14 +111,14 @@ class MathielenImportEngineExtension extends Extension
         }
 
         //enable validation?
-        if ($importConfig['validation']) {
+        if (array_key_exists('validation', $importConfig)) {
             $this->generateValidationDef($importConfig['validation'], $importerDef, $objectFactoryDef);
         }
 
         return $importerDef;
     }
 
-    private function generateValidationDef(array $validationConfig, Definition $importerDef, Definition $objectFactoryDef)
+    private function generateValidationDef(array $validationConfig, Definition $importerDef, Definition $objectFactoryDef=null)
     {
         $validationDef = new Definition('Mathielen\ImportEngine\Validation\ValidatorValidation', array(
             new Reference('validator')
@@ -182,34 +176,11 @@ class MathielenImportEngineExtension extends Extension
 
     private function addStorageProviderDef(Definition $storageLocatorDef, $config, $id = 'default')
     {
-        if (is_array($config)) {
-            extract($config);
-        } elseif (is_string($config)) {
-            switch (true) {
-                case Configuration::isDirectory($config):
-                    $type = 'directory';
-                    $path = $config;
-                    break;
-                case Configuration::isUpload($config):
-                    $type = 'upload';
-                    $path = '/tmp'; //TODO
-                    break;
-                case Configuration::isEntity($config) || Configuration::isDql($config):
-                    $type = 'entity';
-                    break;
-                case Configuration::isFile($config):
-                    $type = 'file';
-                    $uri = $config;
-                    $format = 'csv'; //TODO default?
-                    break;
-            }
-        }
-
-        switch ($type) {
+        switch ($config['type']) {
             case 'directory':
                 $spFinderDef = new Definition('Symfony\Component\Finder\Finder');
                 $spFinderDef->addMethodCall('in', array(
-                    $path
+                    $config['path']
                 ));
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\FinderFileStorageProvider', array(
                     $spFinderDef
@@ -217,13 +188,15 @@ class MathielenImportEngineExtension extends Extension
                 break;
             case 'upload':
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\UploadFileStorageProvider', array(
-                    $path
+                    $config['path']
                 ));
                 break;
-            case 'entity':
+            case 'doctrine':
+                $spDef = null;
+                //TODO
                 break;
             default:
-                throw new \InvalidArgumentException("Unknown type: $type");
+                throw new \InvalidArgumentException('Unknown type: '.$config['type']);
         }
 
         $storageLocatorDef->addMethodCall('register', array(
@@ -235,45 +208,22 @@ class MathielenImportEngineExtension extends Extension
     /**
      * @return Definition
      */
-    private function getStorageDef(array $config, Definition $objectFactoryDef)
+    private function getStorageDef(array $config, Definition $objectFactoryDef=null)
     {
-        if (is_array($config)) {
-            extract($config);
-        } elseif (is_string($config)) {
-            switch (true) {
-                case Configuration::isEntity($config):
-                    $type = 'entity';
-                    break;
-                case Configuration::isFile($config):
-                    $type = 'file';
-                    $uri = $config;
-                    $format = 'csv'; //TODO default?
-                    break;
-                case $serviceInfo = Configuration::isService($config):
-                    $type = 'service';
-                    $service = $serviceInfo[1];
-                    $method = $serviceInfo[2];
-                    //$object_factory = ??
-                    break;
-                default:
-                    $type = 'unknown';
-            }
-        }
-
-        switch ($type) {
+        switch ($config['type']) {
             case 'file':
                 $fileDef = new Definition('SplFileObject', array(
-                    $uri,
+                    $config['uri'],
                     'w'
                 ));
 
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\LocalFileStorage', array(
                     $fileDef,
-                    new Definition("Mathielen\ImportEngine\Storage\Format\\".ucfirst($format)."Format")
+                    new Definition("Mathielen\ImportEngine\Storage\Format\\".ucfirst($config['format'])."Format")
                 ));
 
                 break;
-            case 'entity':
+            case 'doctrine':
                 // $qb = new Definition('Doctrine\ORM\QueryBuilder');
                 // $qb->setFactoryService('doctrine.orm.entity_manager');
                 // $qb->setFactoryMethod('createQueryBuilder');
@@ -286,13 +236,13 @@ class MathielenImportEngineExtension extends Extension
                 break;
             case 'service':
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\ServiceStorage', array(
-                    array(new Reference($service), $method), //callable
+                    array(new Reference($config['service']), $config['method']), //callable
                     $objectFactoryDef //from parameter array
                 ));
 
                 break;
             default:
-                throw new \InvalidArgumentException("Unknown type: $type");
+                throw new \InvalidArgumentException('Unknown type: '.$config['type']);
         }
 
         return $storageDef;

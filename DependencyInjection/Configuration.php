@@ -1,42 +1,124 @@
 <?php
 namespace Mathielen\ImportEngineBundle\DependencyInjection;
 
-class Configuration
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+
+class Configuration implements ConfigurationInterface
 {
 
-    public static function isDirectory($string)
+    public function getConfigTreeBuilder()
     {
-        return is_dir($string) && is_readable($string);
-    }
+        $storageTypes = array('service', 'array', 'doctrine', 'file');
+        $providerTypes = array('directory', 'upload', 'doctrine');
+        $fileFormats = array('csv', 'excel', 'xml', 'yaml');
 
-    public static function isFile($string)
-    {
-        return is_file($string) && is_readable($string);
-    }
+        $treeBuilder = new TreeBuilder();
+        $treeBuilder
+            ->root('mathielen_import_engine')
+            ->fixXmlConfig('importer')
+                ->children()
+                    ->arrayNode('storageprovider')
+                        ->useAttributeAsKey('name')
+                        ->prototype('array')
+                            ->children()
+                                ->enumNode('type')
+                                    ->values($providerTypes)
+                                ->end()
+                                ->scalarNode('path')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                    ->arrayNode('importers')
+                        ->requiresAtLeastOneElement()
+                        ->useAttributeAsKey('name')
+                        ->prototype('array')
+                            ->children()
+                                ->arrayNode('preconditions')
+                                    ->fixXmlConfig('field')
+                                    ->children()
+                                        ->arrayNode('format')
+                                            ->beforeNormalization()
+                                                ->ifString()
+                                                ->then(function($v) { return array($v); })
+                                            ->end()
+                                            ->prototype('enum')
+                                                ->values($fileFormats)
+                                            ->end()
+                                        ->end()
+                                        ->integerNode('fieldcount')->min(0)->end()
+                                        ->arrayNode('filename')
+                                            ->beforeNormalization()
+                                                ->ifString()
+                                                ->then(function($v) { return array($v); })
+                                            ->end()
+                                            ->prototype('scalar')->end()
+                                        ->end()
+                                        ->arrayNode('fieldset')
+                                            ->prototype('scalar')->end()
+                                        ->end()
+                                        ->arrayNode('fields')
+                                            ->prototype('scalar')->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
 
-    public static function isUpload($string)
-    {
-        return $string == 'upload';
-    }
+                                ->arrayNode('object_factory')
+                                    ->children()
+                                        ->enumNode('type')
+                                            ->defaultValue('default')
+                                            ->values(array('default', 'jms_serializer'))
+                                        ->end()
+                                        ->scalarNode('class')
+                                        ->end()
+                                    ->end()
+                                ->end()
 
-    public static function isService($string)
-    {
-        $args = array();
-        if (preg_match('/^([a-z_\.]+)::([a-z]+)$/i', $string, $args)) {
-            return $args;
-        } else {
-            return false;
-        }
-    }
+                                ->arrayNode('source')
+                                    ->children()
+                                        ->enumNode('type')
+                                            ->values($storageTypes)
+                                        ->end()
+                                        ->scalarNode('uri')->end()
+                                        ->enumNode('format')
+                                            ->values($fileFormats)
+                                        ->end()
+                                        ->scalarNode('service')->end()
+                                        ->scalarNode('method')->end()
+                                    ->end()
+                                ->end()
 
-    public static function isDql($string)
-    {
-        //TODO
-    }
+                                ->arrayNode('validation')
+                                    ->children()
+                                        ->arrayNode('source')
+                                            ->prototype('scalar')->end()
+                                        ->end()
+                                        ->arrayNode('target')
+                                            ->prototype('scalar')->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
 
-    public static function isEntity($string)
-    {
-        return class_exists($string);
+                                ->arrayNode('target')
+                                    ->isRequired()
+                                    ->children()
+                                        ->enumNode('type')
+                                            ->values($storageTypes)
+                                        ->end()
+                                        ->scalarNode('uri')->end()
+                                        ->enumNode('format')
+                                            ->values($fileFormats)
+                                        ->end()
+                                        ->scalarNode('service')->end()
+                                        ->scalarNode('method')->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end();
+
+        return $treeBuilder;
     }
 
 }
