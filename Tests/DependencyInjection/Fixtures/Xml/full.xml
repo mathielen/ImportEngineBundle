@@ -30,12 +30,7 @@
                     <mathielen_import_engine:filename>regexp2</mathielen_import_engine:filename>
                 </mathielen_import_engine:preconditions>
                 <mathielen_import_engine:object_factory type="jms_serializer" class="Acme\DemoBundle\ValueObject\MyImportedRow" />
-                <mathielen_import_engine:validation>
-                    <mathielen_import_engine:source>sourceconstraint1</mathielen_import_engine:source>
-                    <mathielen_import_engine:source>sourceconstraint2</mathielen_import_engine:source>
-                    <mathielen_import_engine:target>targetconstraint1</mathielen_import_engine:target>
-                    <mathielen_import_engine:target>targetconstraint2</mathielen_import_engine:target>
-                </mathielen_import_engine:validation>
+                <mathielen_import_engine:validation target="true" />
                 <mathielen_import_engine:target type="service" service="import_service" method="processImportRow" />
             </mathielen_import_engine:importer>
             <mathielen_import_engine:importer name="doctrine_importer">
@@ -45,7 +40,12 @@
                 </mathielen_import_engine:preconditions>
                 <mathielen_import_engine:object_factory type="default" class="Acme\DemoBundle\ValueObject\MyImportedRow" />
                 <mathielen_import_engine:source type="file" uri="/tmp/import.csv" format="csv" />
-                <mathielen_import_engine:validation target="true" />
+                <mathielen_import_engine:validation>
+                    <mathielen_import_engine:source>sourceconstraint1</mathielen_import_engine:source>
+                    <mathielen_import_engine:source>sourceconstraint2</mathielen_import_engine:source>
+                    <mathielen_import_engine:target>targetconstraint1</mathielen_import_engine:target>
+                    <mathielen_import_engine:target>targetconstraint2</mathielen_import_engine:target>
+                </mathielen_import_engine:validation>
                 <mathielen_import_engine:target type="doctrine" />
             </mathielen_import_engine:importer>
 

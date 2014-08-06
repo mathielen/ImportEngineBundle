@@ -118,6 +118,20 @@ class MathielenImportEngineExtension extends Extension
         return $importerDef;
     }
 
+    private function generateValidatorDef()
+    {
+        //eventdispatcher aware source validatorfilter
+        $validatorFilterDef = new Definition('Mathielen\DataImport\Filter\ValidatorFilter', array(
+            new Reference('validator'),
+            new Reference('event_dispatcher')
+        ));
+
+        $validatorFilterDef->addMethodCall('setAllowExtraFields', array(true)); //TODO policy?
+        $validatorFilterDef->addMethodCall('setSkipOnViolation', array(false)); //TODO policy?
+
+        return $validatorFilterDef;
+    }
+
     private function generateValidationDef(array $validationConfig, Definition $importerDef, Definition $objectFactoryDef=null)
     {
         $validationDef = new Definition('Mathielen\ImportEngine\Validation\ValidatorValidation', array(
@@ -128,19 +142,13 @@ class MathielenImportEngineExtension extends Extension
         ));
 
         if (@$validationConfig['source']) {
-            $validatorFilterDef = new Definition('Mathielen\DataImport\Filter\ValidatorFilter', array(
-                new Reference('validator'),
-                new Reference('event_dispatcher')
-            ));
-            $validatorFilterDef->addMethodCall('setAllowExtraFields', array(true)); //TODO policy!
-            $validatorFilterDef->addMethodCall('setSkipOnViolation', array(false)); //TODO policy!
+            $validatorFilterDef = $this->generateValidatorDef();
 
-            //set eventdispatcher aware source validatorfilter
             $validationDef->addMethodCall('setSourceValidatorFilter', array(
                 $validatorFilterDef
             ));
 
-            foreach ($validationConfig['source'] as $field=>$constraint) {
+            foreach ($validationConfig['source']['constraints'] as $field=>$constraint) {
                 $validationDef->addMethodCall('addSourceConstraint', array(
                     $field,
                     new Definition($constraint)
@@ -150,13 +158,27 @@ class MathielenImportEngineExtension extends Extension
 
         //automatically apply class validation
         if (@$validationConfig['target']) {
-            //set eventdispatcher aware target CLASS-validatorfilter
-            //TODO class or property validatorfilter?
-            $validatorFilterDef = new Definition('Mathielen\DataImport\Filter\ClassValidatorFilter', array(
-                new Reference('validator'),
-                $objectFactoryDef,
-                new Reference('event_dispatcher')
-            ));
+
+            //using objects as result
+            if ($objectFactoryDef) {
+
+                //set eventdispatcher aware target CLASS-validatorfilter
+                $validatorFilterDef = new Definition('Mathielen\DataImport\Filter\ClassValidatorFilter', array(
+                    new Reference('validator'),
+                    $objectFactoryDef,
+                    new Reference('event_dispatcher')
+                ));
+
+            } else {
+                $validatorFilterDef = $this->generateValidatorDef();
+
+                foreach ($validationConfig['target']['constraints'] as $field=>$constraint) {
+                    $validationDef->addMethodCall('addTargetConstraint', array(
+                        $field,
+                        new Definition($constraint)
+                    ));
+                }
+            }
 
             $validationDef->addMethodCall('setTargetValidatorFilter', array(
                 $validatorFilterDef

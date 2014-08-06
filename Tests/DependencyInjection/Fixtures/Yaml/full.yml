@@ -24,12 +24,7 @@ mathielen_import_engine:
                 type: jms_serializer
                 class: Acme\DemoBundle\ValueObject\MyImportedRow
             validation:
-                source:
-                    - sourceconstraint1
-                    - sourceconstraint2
-                target:
-                    - targetconstraint1
-                    - targetconstraint2
+                target: ~
             target:
                 type: service
                 service: import_service
@@ -38,14 +33,16 @@ mathielen_import_engine:
             preconditions:
                 format: excel
                 filename: regexp1
-            object_factory:
-                type: default
-                class: Acme\DemoBundle\Entity\MyImportedRow
             source:
                 type: file
                 uri: /tmp/import.csv
                 format: csv
             validation:
-                target: true
+                source:
+                    header1: email
+                    header2: url
+                target:
+                    header1: notempty
+                    header2: notempty
             target:
                 type: doctrine

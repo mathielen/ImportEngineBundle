@@ -40,7 +40,7 @@ Configuration
 ------------
 Add your importer configurations in your `app/config/config.yml`
 
-```php
+```yaml
 mathielen_import_engine:
     #configure storageproviders, that are used in all importers
     storageprovider:
@@ -53,7 +53,7 @@ mathielen_import_engine:
 
             #automaticly recognize this importer by availability of the conditions below
             preconditions:                  #the conditions below can be used
-                format: excel               #format of file must be [csv, excel, xml, ...]
+                format: excel               #format of file must be [csv, excel, xml]
                 fieldcount: 2               #must have this number of fields
                 fields:                     #these fields must exist (order is irrelevant)
                     - 'header2'
@@ -70,9 +70,11 @@ mathielen_import_engine:
 
             #validate imported data
             validation:
-                source:
-                    - myconstraint          #add constraints to source fields
-                target: ~                   #validate against generated object from object-factory (target)
+                source:                     #add constraints to source fields
+                    header1: email
+                    header2: notempty
+                target: ~                   #activate validation against generated object from object-factory (via annotations, xml)
+                                            #or supply list of constraints like in source
 
             #target of import
             target:
@@ -80,3 +82,8 @@ mathielen_import_engine:
                 service: import_service     #service name in DIC
                 method: processImportRow    #method to invoke on service
 ```
+
+Todos
+------------
+* Constraints resolution (name to class)
+* Xml Configuration with validation constraint lists doesnt work
