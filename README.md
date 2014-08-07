@@ -45,8 +45,9 @@ Full example:
 mathielen_import_engine:
     #configure storageproviders, that are used in all importers
     storageprovider:
-        type: upload                        #[upload, service, array, doctrine, file]
-        path: "%kernel.root_dir%/Resources/import"
+        default:
+            type: upload                        #[upload, service, array, doctrine, file]
+            path: "%kernel.root_dir%/Resources/import"
 
     #configure your Importers
     importers:
