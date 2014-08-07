@@ -38,8 +38,9 @@ public function registerBundles()
 
 Configuration
 ------------
-Add your importer configurations in your `app/config/config.yml`
+Add your importer configurations in your `app/config/config.yml`.
 
+Full example:
 ```yaml
 mathielen_import_engine:
     #configure storageproviders, that are used in all importers
@@ -51,19 +52,19 @@ mathielen_import_engine:
     importers:
         your_importer_name:
 
-            #automaticly recognize this importer by availability of the conditions below
-            preconditions:                  #the conditions below can be used
-                format: excel               #format of file must be [csv, excel, xml]
+            #automaticly recognize this importer by meeting of the conditions below
+            preconditions:
+                format: excel               #format of data must be [csv, excel, xml]
                 fieldcount: 2               #must have this number of fields
                 fields:                     #these fields must exist (order is irrelevant)
                     - 'header2'
                     - 'header1'
-                fieldset:                   #the discovered fields must exist exactly this way
+                fieldset:                   #all fields must exist exactly this order
                     - 'header1'
                     - 'header2'
                 filename: 'somefile.xls'    #filename must match one of these regular expression(s) (can be a list)
 
-            #use a object-factory to convert raw row-arrays to target objects
+            #use an object-factory to convert raw row-arrays to target objects
             object_factory:
                 type: jms_serializer        #[jms_serializer, ~]
                 class: Acme\DemoBundle\ValueObject\MyImportedRow
@@ -81,6 +82,17 @@ mathielen_import_engine:
                 type: service               #[service, array, doctrine, file]
                 service: import_service     #service name in DIC
                 method: processImportRow    #method to invoke on service
+```
+
+Minimum example:
+```yaml
+mathielen_import_engine:
+    importers:
+        minimum_importer:
+            target:
+                type: file
+                uri: /tmp/myfile.csv
+                format: csv
 ```
 
 Todos
