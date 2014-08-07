@@ -234,9 +234,8 @@ class MathielenImportEngineExtension extends Extension
     {
         switch ($config['type']) {
             case 'file':
-                $fileDef = new Definition('SplFileObject', array(
-                    $config['uri'],
-                    'w'
+                $fileDef = new Definition('SplFileInfo', array(
+                    $config['uri']
                 ));
 
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\LocalFileStorage', array(

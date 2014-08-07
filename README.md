@@ -96,6 +96,46 @@ mathielen_import_engine:
                 format: csv
 ```
 
+Usage
+------------
+
+```php
+use Mathielen\ImportEngine\ValueObject\ImportConfiguration;
+use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+class DemoController extends Controller
+{
+
+    /**
+     * @Route("/import", name="_demo_import")
+     * @Template()
+     */
+    public function importAction(Request $request)
+    {
+        //handle the uploaded file
+        $storageLocator = $this->container->get('mathielen_importengine.import.storagelocator');
+        $storageSelection = $storageLocator->selectStorage('default', $request->files->getIterator()->current());
+
+        //create a new import configuration with your file for the specified importer
+        //you can also use auto-discovery with preconditions (see config above and omit 2nd parameter here)
+        $importConfiguration = new ImportConfiguration($storageSelection, 'your_importer_name');
+
+        //build the import engine
+        $importBuilder = $this->container->get('mathielen_importengine.import.builder');
+        $importBuilder->build($importConfiguration);
+
+        //run the import
+        $importRunner = $this->container->get('mathielen_importengine.import.runner');
+        $importRun = $importRunner->run($importConfiguration->toRun());
+
+        return $importRun->getStatistics();
+    }
+
+}
+```
+
 Todos
 ------------
 * Constraints resolution (name to class)
