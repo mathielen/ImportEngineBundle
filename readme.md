@@ -45,10 +45,18 @@ Full example:
 mathielen_import_engine:
     #configure storageproviders, that are used in all importers
     storageprovider:
-        default:
-            type: upload                        #[upload, service, array, doctrine, file]
+        upload:
+            type: upload
             path: "%kernel.root_dir%/Resources/import"
-
+        local:
+            type: directory
+            uri: /tmp/somedir
+        doctrine:
+            type: doctrine
+            queries:
+                - SELECT id FROM Acme\DemoBundle\Entity\Person P WHERE P.age > 10
+                - Acme\DemoBundle\Entity\ImportData
+                
     #configure your Importers
     importers:
         your_importer_name:
@@ -80,7 +88,7 @@ mathielen_import_engine:
 
             #target of import
             target:
-                type: service               #[service, array, doctrine, file]
+                type: service               #[service, doctrine, file]
                 service: import_service     #service name in DIC
                 method: processImportRow    #method to invoke on service
 ```
@@ -138,5 +146,4 @@ class DemoController extends Controller
 
 Todos
 ------------
-* Constraints resolution (name to class)
 * Xml Configuration with validation constraint lists doesnt work
