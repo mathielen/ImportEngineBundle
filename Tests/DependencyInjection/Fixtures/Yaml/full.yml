@@ -2,12 +2,15 @@ mathielen_import_engine:
     storageprovider:
         upload:
             type: upload
-            path: /tmp/uploaddir
+            uri: /tmp/uploaddir
         local:
             type: directory
-            path: /tmp/cached
+            uri: /tmp/cached
         doctrine:
             type: doctrine
+            queries:
+                - SELECT id FROM Acme\DemoBundle\Entity\Person P WHERE P.age > 10
+                - Acme\DemoBundle\Entity\ImportData
     importers:
         maximum_importer:
             preconditions:
@@ -24,6 +27,9 @@ mathielen_import_engine:
                 type: jms_serializer
                 class: Acme\DemoBundle\ValueObject\MyImportedRow
             validation:
+                options:
+                    allowExtraFields: false
+                    allowMissingFields: true
                 target: ~
             target:
                 type: service
@@ -46,3 +52,4 @@ mathielen_import_engine:
                     header2: notempty
             target:
                 type: doctrine
+                entity: Acme\DemoBundle\Entity\MyImportedEntity

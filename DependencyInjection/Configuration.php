@@ -25,7 +25,12 @@ class Configuration implements ConfigurationInterface
                                 ->enumNode('type')
                                     ->values($providerTypes)
                                 ->end()
-                                ->scalarNode('path')->end()
+                                ->scalarNode('uri')->end()      //file
+                                ->scalarNode('service')->end()  //service
+                                ->scalarNode('method')->end()   //service
+                                ->arrayNode('queries')
+                                    ->prototype('scalar')->end()
+                                ->end()
                             ->end()
                         ->end()
                     ->end()
@@ -90,6 +95,12 @@ class Configuration implements ConfigurationInterface
 
                                 ->arrayNode('validation')
                                     ->children()
+                                        ->arrayNode('options')
+                                            ->children()
+                                                ->booleanNode('allowExtraFields')->end()
+                                                ->booleanNode('allowMissingFields')->end()
+                                            ->end()
+                                        ->end()
                                         ->arrayNode('source')
                                             ->beforeNormalization()
                                                 ->ifArray()
@@ -121,12 +132,13 @@ class Configuration implements ConfigurationInterface
                                         ->enumNode('type')
                                             ->values($storageTypes)
                                         ->end()
-                                        ->scalarNode('uri')->end()
-                                        ->enumNode('format')
+                                        ->enumNode('format')            //file
                                             ->values($fileFormats)
                                         ->end()
-                                        ->scalarNode('service')->end()
-                                        ->scalarNode('method')->end()
+                                        ->scalarNode('uri')->end()      //file
+                                        ->scalarNode('service')->end()  //service
+                                        ->scalarNode('method')->end()   //service
+                                        ->scalarNode('entity')->end()   //doctrine
                                     ->end()
                                 ->end()
                             ->end()

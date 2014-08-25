@@ -7,14 +7,16 @@
         <mathielen_import_engine:config>
             <mathielen_import_engine:storageprovider name="upload">
                 <mathielen_import_engine:type>upload</mathielen_import_engine:type>
-                <mathielen_import_engine:path>/tmp/uploaddir</mathielen_import_engine:path>
+                <mathielen_import_engine:uri>/tmp/uploaddir</mathielen_import_engine:uri>
             </mathielen_import_engine:storageprovider>
             <mathielen_import_engine:storageprovider name="local">
                 <mathielen_import_engine:type>directory</mathielen_import_engine:type>
-                <mathielen_import_engine:path>/tmp/cached</mathielen_import_engine:path>
+                <mathielen_import_engine:uri>/tmp/cached</mathielen_import_engine:uri>
             </mathielen_import_engine:storageprovider>
             <mathielen_import_engine:storageprovider name="doctrine">
                 <mathielen_import_engine:type>doctrine</mathielen_import_engine:type>
+                <mathielen_import_engine:queries>SELECT id FROM Acme\DemoBundle\Entity\Person P WHERE P.age > 10</mathielen_import_engine:queries>
+                <mathielen_import_engine:queries>Acme\DemoBundle\Entity\ImportData</mathielen_import_engine:queries>
             </mathielen_import_engine:storageprovider>
 
             <mathielen_import_engine:importer name="maximum_importer">
@@ -30,7 +32,10 @@
                     <mathielen_import_engine:filename>regexp2</mathielen_import_engine:filename>
                 </mathielen_import_engine:preconditions>
                 <mathielen_import_engine:object_factory type="jms_serializer" class="Acme\DemoBundle\ValueObject\MyImportedRow" />
-                <mathielen_import_engine:validation target="true" />
+                <mathielen_import_engine:validation>
+                    <mathielen_import_engine:options allowExtraFields="false" allowMissingFields="true" />
+                    <mathielen_import_engine:target/>
+                </mathielen_import_engine:validation>
                 <mathielen_import_engine:target type="service" service="import_service" method="processImportRow" />
             </mathielen_import_engine:importer>
             <mathielen_import_engine:importer name="doctrine_importer">
@@ -46,7 +51,7 @@
                     <mathielen_import_engine:target>targetconstraint1</mathielen_import_engine:target>
                     <mathielen_import_engine:target>targetconstraint2</mathielen_import_engine:target>
                 </mathielen_import_engine:validation>
-                <mathielen_import_engine:target type="doctrine" />
+                <mathielen_import_engine:target type="doctrine" entity="Acme\DemoBundle\Entity\MyImportedEntity" />
             </mathielen_import_engine:importer>
 
         </mathielen_import_engine:config>

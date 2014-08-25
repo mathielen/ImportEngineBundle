@@ -118,16 +118,14 @@ class MathielenImportEngineExtension extends Extension
         return $importerDef;
     }
 
-    private function generateValidatorDef()
+    private function generateValidatorDef(array $options)
     {
         //eventdispatcher aware source validatorfilter
         $validatorFilterDef = new Definition('Mathielen\DataImport\Filter\ValidatorFilter', array(
             new Reference('validator'),
+            $options,
             new Reference('event_dispatcher')
         ));
-
-        $validatorFilterDef->addMethodCall('setAllowExtraFields', array(true)); //TODO policy?
-        $validatorFilterDef->addMethodCall('setSkipOnViolation', array(false)); //TODO policy?
 
         return $validatorFilterDef;
     }
@@ -141,9 +139,11 @@ class MathielenImportEngineExtension extends Extension
             $validationDef
         ));
 
-        if (@$validationConfig['source']) {
-            $validatorFilterDef = $this->generateValidatorDef();
+        $validatorFilterDef = $this->generateValidatorDef(
+            array_key_exists('options', $validationConfig)?$validationConfig['options']:array()
+        );
 
+        if (@$validationConfig['source']) {
             $validationDef->addMethodCall('setSourceValidatorFilter', array(
                 $validatorFilterDef
             ));
@@ -170,8 +170,6 @@ class MathielenImportEngineExtension extends Extension
                 ));
 
             } else {
-                $validatorFilterDef = $this->generateValidatorDef();
-
                 foreach ($validationConfig['target']['constraints'] as $field=>$constraint) {
                     $validationDef->addMethodCall('addTargetConstraint', array(
                         $field,
@@ -202,7 +200,7 @@ class MathielenImportEngineExtension extends Extension
             case 'directory':
                 $spFinderDef = new Definition('Symfony\Component\Finder\Finder');
                 $spFinderDef->addMethodCall('in', array(
-                    $config['path']
+                    $config['uri']
                 ));
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\FinderFileStorageProvider', array(
                     $spFinderDef
@@ -210,15 +208,15 @@ class MathielenImportEngineExtension extends Extension
                 break;
             case 'upload':
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\UploadFileStorageProvider', array(
-                    $config['path']
+                    $config['uri']
                 ));
                 break;
             case 'doctrine':
-                $spDef = null;
-                //TODO
+                $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\DoctrineQueryStorageProvider', array(
+                    new Reference('doctrine.orm.entity_manager'),
+                    array($config['queries'])
+                ));
                 break;
-            default:
-                throw new \InvalidArgumentException('Unknown type: '.$config['type']);
         }
 
         $storageLocatorDef->addMethodCall('register', array(
@@ -245,13 +243,9 @@ class MathielenImportEngineExtension extends Extension
 
                 break;
             case 'doctrine':
-                // $qb = new Definition('Doctrine\ORM\QueryBuilder');
-                // $qb->setFactoryService('doctrine.orm.entity_manager');
-                // $qb->setFactoryMethod('createQueryBuilder');
-
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\DoctrineStorage', array(
                     new Reference('doctrine.orm.entity_manager'),
-                    $config
+                    $config['entity']
                 ));
 
                 break;
@@ -262,8 +256,6 @@ class MathielenImportEngineExtension extends Extension
                 ));
 
                 break;
-            default:
-                throw new \InvalidArgumentException('Unknown type: '.$config['type']);
         }
 
         return $storageDef;
