@@ -47,7 +47,7 @@ mathielen_import_engine:
     storageprovider:
         upload:
             type: upload
-            path: "%kernel.root_dir%/Resources/import"
+            uri: "%kernel.root_dir%/Resources/import"
         local:
             type: directory
             uri: /tmp/somedir
