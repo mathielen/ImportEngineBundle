@@ -2,7 +2,6 @@
 namespace Mathielen\ImportEngineBundle\Tests\DependencyInjection;
 
 use Mathielen\ImportEngineBundle\DependencyInjection\MathielenImportEngineExtension;
-use MyProject\Proxies\__CG__\stdClass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
@@ -46,7 +45,7 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testFullConfiguration()
     {
-        $this->container->register('import_service', new \stdClass()); //target service
+        $this->container->register('import_service', new MyImportService()); //target service
         $this->container->register('jms_serializer', $this->getMock('JMS\Serializer\SerializerInterface'));
         $this->container->register('validator', $this->getMock('Symfony\Component\Validator\ValidatorInterface'));
         $this->container->register('doctrine.orm.entity_manager', $this->getMock('Doctrine\ORM\EntityManagerInterface'));
@@ -63,4 +62,8 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->has('mathielen_importengine.import.builder'));
     }
 
+}
+
+class MyImportService
+{
 }

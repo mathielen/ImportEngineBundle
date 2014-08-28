@@ -1,6 +1,7 @@
 <?php
 namespace Mathielen\ImportEngineBundle\DependencyInjection;
 
+use Mathielen\ImportEngine\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -217,6 +218,8 @@ class MathielenImportEngineExtension extends Extension
                     array($config['queries'])
                 ));
                 break;
+            default:
+                throw new InvalidConfigurationException('Unknown type for storage provider: '.$config['type']);
         }
 
         $storageLocatorDef->addMethodCall('register', array(
@@ -256,6 +259,8 @@ class MathielenImportEngineExtension extends Extension
                 ));
 
                 break;
+            default:
+                throw new InvalidConfigurationException('Unknown type for storage: '.$config['type']);
         }
 
         return $storageDef;
