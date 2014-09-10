@@ -24,7 +24,7 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 
     abstract protected function loadConfiguration(ContainerBuilder $container, $resource);
 
-    private function getContainer($resource=null)
+    private function getContainer($resource = null)
     {
         if ($resource) {
             $this->loadConfiguration($this->container, $resource);
@@ -36,6 +36,14 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
         return $this->container;
     }
 
+    private function registerFullConfigurationDependencies()
+    {
+        $this->container->register('import_service', new MyImportService()); //target service
+        $this->container->register('jms_serializer', $this->getMock('JMS\Serializer\SerializerInterface'));
+        $this->container->register('validator', $this->getMock('Symfony\Component\Validator\ValidatorInterface'));
+        $this->container->register('doctrine.orm.entity_manager', $this->getMock('Doctrine\ORM\EntityManagerInterface'));
+    }
+
     public function testWithoutConfiguration()
     {
         $container = $this->getContainer();
@@ -45,10 +53,7 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testFullConfiguration()
     {
-        $this->container->register('import_service', new MyImportService()); //target service
-        $this->container->register('jms_serializer', $this->getMock('JMS\Serializer\SerializerInterface'));
-        $this->container->register('validator', $this->getMock('Symfony\Component\Validator\ValidatorInterface'));
-        $this->container->register('doctrine.orm.entity_manager', $this->getMock('Doctrine\ORM\EntityManagerInterface'));
+        $this->registerFullConfigurationDependencies();
 
         $container = $this->getContainer('full');
         $this->assertTrue($container->has('mathielen_importengine.import.storagelocator'));
@@ -62,6 +67,24 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->has('mathielen_importengine.import.builder'));
     }
 
+    public function testStorageProvidersAreProperlyRegisteredByTheirName()
+    {
+        $this->registerFullConfigurationDependencies();
+
+        $container = $this->getContainer('full');
+
+        $storageLocatorDef = $container->findDefinition('mathielen_importengine.import.storagelocator');
+        $methodCalls       = $storageLocatorDef->getMethodCalls();
+
+        $registeredStorageProviderIds = [];
+        foreach ($methodCalls as $methodCall) {
+            $arguments = $methodCall[1];
+
+            $registeredStorageProviderIds[] = $arguments[0];
+        }
+
+        $this->assertEquals(['upload', 'local', 'doctrine'], $registeredStorageProviderIds);
+    }
 }
 
 class MyImportService
