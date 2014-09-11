@@ -27,8 +27,8 @@ class MathielenImportEngineExtension extends Extension
     private function parseConfig(array $config, ContainerBuilder $container)
     {
         $storageLocatorDef = $container->findDefinition('mathielen_importengine.import.storagelocator');
-        foreach ($config['storageprovider'] as $sourceConfig) {
-            $this->addStorageProviderDef($storageLocatorDef, $sourceConfig);
+        foreach ($config['storageprovider'] as $name => $sourceConfig) {
+            $this->addStorageProviderDef($storageLocatorDef, $sourceConfig, $name);
         }
 
         $importerRepositoryDef = $container->findDefinition('mathielen_importengine.importer.repository');
