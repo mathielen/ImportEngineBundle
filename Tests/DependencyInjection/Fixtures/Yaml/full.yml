@@ -11,6 +11,11 @@ mathielen_import_engine:
             queries:
                 - SELECT id FROM Acme\DemoBundle\Entity\Person P WHERE P.age > 10
                 - Acme\DemoBundle\Entity\ImportData
+        services:
+            type: service
+            services:
+                export_serviceA: [exportMethod1, exportMethod2]
+                export_serviceB: ~
     importers:
         maximum_importer:
             preconditions:

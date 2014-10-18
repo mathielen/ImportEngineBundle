@@ -83,7 +83,7 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
             $registeredStorageProviderIds[] = $arguments[0];
         }
 
-        $this->assertEquals(['upload', 'local', 'doctrine'], $registeredStorageProviderIds);
+        $this->assertEquals(['upload', 'local', 'doctrine', 'services'], $registeredStorageProviderIds);
     }
 }
 

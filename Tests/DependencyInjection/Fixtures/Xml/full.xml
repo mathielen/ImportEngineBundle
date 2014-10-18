@@ -15,8 +15,16 @@
             </mathielen_import_engine:storageprovider>
             <mathielen_import_engine:storageprovider name="doctrine">
                 <mathielen_import_engine:type>doctrine</mathielen_import_engine:type>
-                <mathielen_import_engine:queries>SELECT id FROM Acme\DemoBundle\Entity\Person P WHERE P.age > 10</mathielen_import_engine:queries>
-                <mathielen_import_engine:queries>Acme\DemoBundle\Entity\ImportData</mathielen_import_engine:queries>
+                <mathielen_import_engine:query>SELECT id FROM Acme\DemoBundle\Entity\Person P WHERE P.age > 10</mathielen_import_engine:query>
+                <mathielen_import_engine:query>Acme\DemoBundle\Entity\ImportData</mathielen_import_engine:query>
+            </mathielen_import_engine:storageprovider>
+            <mathielen_import_engine:storageprovider name="services">
+                <mathielen_import_engine:type>service</mathielen_import_engine:type>
+                <mathielen_import_engine:service name="export_serviceA">
+                    <mathielen_import_engine:method>exportMethod1</mathielen_import_engine:method>
+                    <mathielen_import_engine:method>exportMethod2</mathielen_import_engine:method>
+                </mathielen_import_engine:service>
+                <mathielen_import_engine:service name="export_serviceB" />
             </mathielen_import_engine:storageprovider>
 
             <mathielen_import_engine:importer name="maximum_importer">
@@ -24,10 +32,10 @@
                     <mathielen_import_engine:format>excel</mathielen_import_engine:format>
                     <mathielen_import_engine:format>csv</mathielen_import_engine:format>
                     <mathielen_import_engine:fieldcount>2</mathielen_import_engine:fieldcount>
-                    <mathielen_import_engine:field>regexp1</mathielen_import_engine:field>
-                    <mathielen_import_engine:field>regexp2</mathielen_import_engine:field>
-                    <mathielen_import_engine:fieldset>regexp1</mathielen_import_engine:fieldset>
-                    <mathielen_import_engine:fieldset>regexp2</mathielen_import_engine:fieldset>
+                    <mathielen_import_engine:field>header2</mathielen_import_engine:field>
+                    <mathielen_import_engine:field>header1</mathielen_import_engine:field>
+                    <mathielen_import_engine:fieldset>header1</mathielen_import_engine:fieldset>
+                    <mathielen_import_engine:fieldset>header2</mathielen_import_engine:fieldset>
                     <mathielen_import_engine:filename>regexp1</mathielen_import_engine:filename>
                     <mathielen_import_engine:filename>regexp2</mathielen_import_engine:filename>
                 </mathielen_import_engine:preconditions>
@@ -43,13 +51,16 @@
                     <mathielen_import_engine:format>excel</mathielen_import_engine:format>
                     <mathielen_import_engine:filename>regexp1</mathielen_import_engine:filename>
                 </mathielen_import_engine:preconditions>
-                <mathielen_import_engine:object_factory type="default" class="Acme\DemoBundle\ValueObject\MyImportedRow" />
                 <mathielen_import_engine:source type="file" uri="/tmp/import.csv" format="csv" />
                 <mathielen_import_engine:validation>
-                    <mathielen_import_engine:source>sourceconstraint1</mathielen_import_engine:source>
-                    <mathielen_import_engine:source>sourceconstraint2</mathielen_import_engine:source>
-                    <mathielen_import_engine:target>targetconstraint1</mathielen_import_engine:target>
-                    <mathielen_import_engine:target>targetconstraint2</mathielen_import_engine:target>
+                    <mathielen_import_engine:source>
+                        <mathielen_import_engine:constraints field="header1">email</mathielen_import_engine:constraints>
+                        <mathielen_import_engine:constraints field="header2">url</mathielen_import_engine:constraints>
+                    </mathielen_import_engine:source>
+                    <mathielen_import_engine:target>
+                        <mathielen_import_engine:constraint field="header1">notempty</mathielen_import_engine:constraint>
+                        <mathielen_import_engine:constraint field="header2">notempty</mathielen_import_engine:constraint>
+                    </mathielen_import_engine:target>
                 </mathielen_import_engine:validation>
                 <mathielen_import_engine:target type="doctrine" entity="Acme\DemoBundle\Entity\MyImportedEntity" />
             </mathielen_import_engine:importer>

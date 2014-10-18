@@ -56,7 +56,13 @@ mathielen_import_engine:
             queries:
                 - SELECT id FROM Acme\DemoBundle\Entity\Person P WHERE P.age > 10
                 - Acme\DemoBundle\Entity\ImportData
-                
+        services:
+            type: service
+            services:
+                #the services export_serviceA and export_serviceB must be configured in DIC
+                export_serviceA: [exportMethod1, exportMethod2] #restrict to specific methods of service
+                export_serviceB: ~ #every method of service can be used
+                 
     #configure your Importers
     importers:
         your_importer_name:
@@ -75,7 +81,7 @@ mathielen_import_engine:
 
             #use an object-factory to convert raw row-arrays to target objects
             object_factory:
-                type: jms_serializer        #[jms_serializer, ~]
+                type: jms_serializer        #[jms_serializer, default]
                 class: Acme\DemoBundle\ValueObject\MyImportedRow
 
             #validate imported data
@@ -104,8 +110,18 @@ mathielen_import_engine:
                 format: csv
 ```
 
+Check out the Testsuite for more information.
+
 Usage
 ------------
+
+##ä On the command line
+
+```bash
+$ app/console importengine:import your_importer_name /tmp/somedir/myfile.csv local
+```
+
+### Within a controller / service
 
 ```php
 use Mathielen\ImportEngine\ValueObject\ImportConfiguration;

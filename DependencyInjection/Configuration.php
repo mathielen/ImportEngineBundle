@@ -10,7 +10,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $storageTypes = array('service', 'array', 'doctrine', 'file');
-        $providerTypes = array('directory', 'upload', 'doctrine');
+        $providerTypes = array('directory', 'upload', 'doctrine', 'service');
         $fileFormats = array('csv', 'excel', 'xml', 'yaml');
 
         $treeBuilder = new TreeBuilder();
@@ -21,13 +21,28 @@ class Configuration implements ConfigurationInterface
                     ->arrayNode('storageprovider')
                         ->useAttributeAsKey('name')
                         ->prototype('array')
+                            ->fixXmlConfig('service') //allows <service> instead of <services>
+                            ->fixXmlConfig('query', 'queries') //allows <query> instead of <queries>
                             ->children()
                                 ->enumNode('type')
                                     ->values($providerTypes)
                                 ->end()
                                 ->scalarNode('uri')->end()      //file
-                                ->scalarNode('service')->end()  //service
-                                ->scalarNode('method')->end()   //service
+                                ->arrayNode('services')
+                                    ->useAttributeAsKey('name')
+                                    ->prototype('array')
+                                        ->fixXmlConfig('method') //allows <method> instead of <methods>
+                                        ->beforeNormalization()
+                                            ->ifArray()
+                                            ->then(function ($v) { return isset($v['methods'])||isset($v['method'])?$v:array('methods'=>$v); })
+                                        ->end()
+                                        ->children()
+                                            ->arrayNode('methods')
+                                                ->prototype('scalar')->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
                                 ->arrayNode('queries')
                                     ->prototype('scalar')->end()
                                 ->end()
@@ -40,7 +55,7 @@ class Configuration implements ConfigurationInterface
                         ->prototype('array')
                             ->children()
                                 ->arrayNode('preconditions')
-                                    ->fixXmlConfig('field')
+                                    ->fixXmlConfig('field')  //allows <field> instead of <fields>
                                     ->children()
                                         ->arrayNode('format')
                                             ->beforeNormalization()
@@ -102,23 +117,27 @@ class Configuration implements ConfigurationInterface
                                             ->end()
                                         ->end()
                                         ->arrayNode('source')
+                                            ->fixXmlConfig('constraint') //allows <constraint> instead of <constraints>
                                             ->beforeNormalization()
                                                 ->ifArray()
-                                                ->then(function ($v) { return array('constraints'=>$v); })
+                                                ->then(function ($v) { return isset($v['constraint'])||isset($v['constraints'])?$v:array('constraints'=>$v); })
                                             ->end()
                                             ->children()
                                                 ->arrayNode('constraints')
+                                                    ->useAttributeAsKey('field')
                                                     ->prototype('scalar')->end()
                                                 ->end()
                                             ->end()
                                         ->end()
                                         ->arrayNode('target')
+                                            ->fixXmlConfig('constraint') //allows <constraint> instead of <constraints>
                                             ->beforeNormalization()
                                                 ->ifArray()
-                                                ->then(function ($v) { return array('constraints'=>$v); })
+                                                ->then(function ($v) { return isset($v['constraint'])||isset($v['constraints'])?$v:array('constraints'=>$v); })
                                             ->end()
                                             ->children()
                                                 ->arrayNode('constraints')
+                                                    ->useAttributeAsKey('field')
                                                     ->prototype('scalar')->end()
                                                 ->end()
                                             ->end()

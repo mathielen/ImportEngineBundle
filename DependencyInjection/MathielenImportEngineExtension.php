@@ -218,6 +218,12 @@ class MathielenImportEngineExtension extends Extension
                     array($config['queries'])
                 ));
                 break;
+            case 'service':
+                $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\ServiceStorageProvider', array(
+                    new Reference('service_container'),
+                    $config['services']
+                ));
+                break;
             default:
                 throw new InvalidConfigurationException('Unknown type for storage provider: '.$config['type']);
         }
