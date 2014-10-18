@@ -159,7 +159,3 @@ class DemoController extends Controller
 
 }
 ```
-
-Todos
-------------
-* Xml Configuration with validation constraint lists doesnt work
