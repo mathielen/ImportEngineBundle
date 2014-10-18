@@ -115,7 +115,7 @@ Check out the Testsuite for more information.
 Usage
 ------------
 
-##ä On the command line
+### On the command line
 
 ```bash
 $ app/console importengine:import your_importer_name /tmp/somedir/myfile.csv local
