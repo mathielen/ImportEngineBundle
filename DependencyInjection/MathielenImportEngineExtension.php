@@ -261,6 +261,7 @@ class MathielenImportEngineExtension extends Extension
             case 'service':
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\ServiceStorage', array(
                     array(new Reference($config['service']), $config['method']), //callable
+                    array(),
                     $objectFactoryDef //from parameter array
                 ));
 
