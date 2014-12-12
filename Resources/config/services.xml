@@ -10,6 +10,8 @@
 		</service>
 
 		<service id="mathielen_importengine.importer.repository" class="Mathielen\ImportEngine\Importer\ImporterRepository" public="false">
+            <argument type="service" id="logger" />
+            <tag name="monolog.logger" channel="mathielen_importengine.importer" />
 		</service>
 
         <service id="mathielen_importengine.import.storagelocator" class="Mathielen\ImportEngine\Storage\StorageLocator">
