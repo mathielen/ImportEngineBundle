@@ -20,6 +20,7 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
         $this->container = new ContainerBuilder();
         $this->container->registerExtension($this->extension);
         $this->container->register('event_dispatcher', $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
+        $this->container->register('logger', $this->getMock('Psr\Log\LoggerInterface'));
     }
 
     abstract protected function loadConfiguration(ContainerBuilder $container, $resource);
@@ -42,6 +43,7 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
         $this->container->register('jms_serializer', $this->getMock('JMS\Serializer\SerializerInterface'));
         $this->container->register('validator', $this->getMock('Symfony\Component\Validator\ValidatorInterface'));
         $this->container->register('doctrine.orm.entity_manager', $this->getMock('Doctrine\ORM\EntityManagerInterface'));
+        $this->container->register('logger', $this->getMock('Psr\Log\LoggerInterface'));
     }
 
     public function testWithoutConfiguration()

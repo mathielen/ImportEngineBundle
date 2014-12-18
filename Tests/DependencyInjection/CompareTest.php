@@ -20,6 +20,7 @@ class CompareTest extends \PHPUnit_Framework_TestCase
         $container->register('jms_serializer', $this->getMock('JMS\Serializer\SerializerInterface'));
         $container->register('validator', $this->getMock('Symfony\Component\Validator\ValidatorInterface'));
         $container->register('doctrine.orm.entity_manager', $this->getMock('Doctrine\ORM\EntityManagerInterface'));
+        $container->register('logger', $this->getMock('Psr\Log\LoggerInterface'));
 
         return $container;
     }
