@@ -52,6 +52,7 @@ class CompareTest extends \PHPUnit_Framework_TestCase
     public function testFullXmlAndYamlSame()
     {
         $this->assertEquals($this->getYamlDefinitions('full'), $this->getXmlDefinitions('full'));
+        $this->assertEquals($this->getYamlDefinitions('medium'), $this->getXmlDefinitions('medium'));
         $this->assertEquals($this->getYamlDefinitions('minimum'), $this->getXmlDefinitions('minimum'));
     }
 

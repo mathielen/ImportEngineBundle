@@ -33,8 +33,10 @@ class ImportCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->getContainer()->has('mathielen_importengine.import.builder')) {
-            throw new InvalidConfigurationException("No importengine builder service has been found. Did you register the bundle in AppKernel and configured at least one importer in config?");
+        if (!$this->getContainer()->has('mathielen_importengine.import.builder') ||
+            !$this->getContainer()->has('mathielen_importengine.import.storagelocator') ||
+            !$this->getContainer()->has('mathielen_importengine.import.runner')) {
+            throw new InvalidConfigurationException("No importengine services have been found. Did you register the bundle in AppKernel and configured at least one importer in config?");
         }
 
         $progress = new ProgressBar($output);
@@ -47,7 +49,7 @@ class ImportCommand extends ContainerAwareCommand
         $storageSelection = $storageLocator->selectStorage($sourceProvider, $sourceId);
         $importConfiguration = new ImportConfiguration($storageSelection, $importerName);
 
-        $output->writeln("Commencing import using importer <info>$importerName</info> with source provider <info>$sourceProvider</info> and source id <info>$sourceId</info>");
+        $output->writeln("Commencing import using importer <info>$importerName</info> with source provider <info>$sourceProvider</info> and source id <info>".$input->getArgument('source_id')."</info>");
 
         /** @var ImportBuilder $importBuilder */
         $importBuilder = $this->getContainer()->get('mathielen_importengine.import.builder');
@@ -102,21 +104,23 @@ class ImportCommand extends ContainerAwareCommand
 
     private function parseSourceId($sourceId)
     {
-        if (is_dir($sourceId) || is_file($sourceId)) {
-            return $sourceId;
+        if (preg_match('/[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)+/', $sourceId)) {
+            $parsedSourceId = parse_url($sourceId);
+            if (array_key_exists('query', $parsedSourceId)) {
+                parse_str($parsedSourceId['query'], $parsedSourceId['query']);
+            }
+            $pathTokens = explode('.', $parsedSourceId['path']);
+            $method = array_pop($pathTokens);
+            $service = join('.', $pathTokens);
+
+            return array(
+                'service' => $service,
+                'method' => $method,
+                'arguments' => $parsedSourceId['query']
+            );
         }
 
-        $sourceId = parse_url($sourceId);
-        @parse_str($sourceId['query'], $sourceId['query']);
-        $pathTokens = explode('.', $sourceId['path']);
-        $method = array_pop($pathTokens);
-        $service = join('.', $pathTokens);
-
-        return array(
-            'service' => $service,
-            'method' => $method,
-            'arguments' => array($sourceId['query'])
-        );
+        return $sourceId;
     }
 
 }

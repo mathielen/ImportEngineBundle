@@ -1,0 +1,14 @@
+mathielen_import_engine:
+    importers:
+        minimum_importer:
+            validation:
+                source:
+                    header1: email
+                    header2: url
+                target:
+                    header1: notempty
+                    header2: notempty
+            target:
+                type: file
+                uri: /tmp/myfile.csv
+                format: csv

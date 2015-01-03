@@ -144,7 +144,7 @@ class MathielenImportEngineExtension extends Extension
             array_key_exists('options', $validationConfig)?$validationConfig['options']:array()
         );
 
-        if (@$validationConfig['source']) {
+        if (array_key_exists('source', $validationConfig)) {
             $validationDef->addMethodCall('setSourceValidatorFilter', array(
                 $validatorFilterDef
             ));
@@ -158,7 +158,7 @@ class MathielenImportEngineExtension extends Extension
         }
 
         //automatically apply class validation
-        if (@$validationConfig['target']) {
+        if (array_key_exists('target', $validationConfig)) {
 
             //using objects as result
             if ($objectFactoryDef) {

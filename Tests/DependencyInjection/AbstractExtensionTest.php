@@ -19,8 +19,13 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->container = new ContainerBuilder();
         $this->container->registerExtension($this->extension);
-        $this->container->register('event_dispatcher', $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
-        $this->container->register('logger', $this->getMock('Psr\Log\LoggerInterface'));
+        $this->container->set('event_dispatcher', $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
+        $this->container->set('logger', $this->getMock('Psr\Log\LoggerInterface'));
+        $this->container->set('import_service', new MyImportService()); //target service
+        $this->container->set('jms_serializer', $this->getMock('JMS\Serializer\SerializerInterface'));
+        $this->container->set('validator', $this->getMock('Symfony\Component\Validator\ValidatorInterface'));
+        $this->container->set('doctrine.orm.entity_manager', $this->getMock('Doctrine\ORM\EntityManagerInterface'));
+        $this->container->set('logger', $this->getMock('Psr\Log\LoggerInterface'));
     }
 
     abstract protected function loadConfiguration(ContainerBuilder $container, $resource);
@@ -37,15 +42,6 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
         return $this->container;
     }
 
-    private function registerFullConfigurationDependencies()
-    {
-        $this->container->register('import_service', new MyImportService()); //target service
-        $this->container->register('jms_serializer', $this->getMock('JMS\Serializer\SerializerInterface'));
-        $this->container->register('validator', $this->getMock('Symfony\Component\Validator\ValidatorInterface'));
-        $this->container->register('doctrine.orm.entity_manager', $this->getMock('Doctrine\ORM\EntityManagerInterface'));
-        $this->container->register('logger', $this->getMock('Psr\Log\LoggerInterface'));
-    }
-
     public function testWithoutConfiguration()
     {
         $container = $this->getContainer();
@@ -55,9 +51,14 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testFullConfiguration()
     {
-        $this->registerFullConfigurationDependencies();
-
         $container = $this->getContainer('full');
+        $this->assertTrue($container->has('mathielen_importengine.import.storagelocator'));
+        $this->assertTrue($container->has('mathielen_importengine.import.builder'));
+    }
+
+    public function testMediumConfiguration()
+    {
+        $container = $this->getContainer('medium');
         $this->assertTrue($container->has('mathielen_importengine.import.storagelocator'));
         $this->assertTrue($container->has('mathielen_importengine.import.builder'));
     }
@@ -71,8 +72,6 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testStorageProvidersAreProperlyRegisteredByTheirName()
     {
-        $this->registerFullConfigurationDependencies();
-
         $container = $this->getContainer('full');
 
         $storageLocatorDef = $container->findDefinition('mathielen_importengine.import.storagelocator');

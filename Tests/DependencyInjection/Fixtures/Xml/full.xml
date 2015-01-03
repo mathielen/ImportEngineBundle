@@ -46,21 +46,16 @@
                 </mathielen_import_engine:validation>
                 <mathielen_import_engine:target type="service" service="import_service" method="processImportRow" />
             </mathielen_import_engine:importer>
+
             <mathielen_import_engine:importer name="doctrine_importer">
                 <mathielen_import_engine:preconditions>
                     <mathielen_import_engine:format>excel</mathielen_import_engine:format>
                     <mathielen_import_engine:filename>regexp1</mathielen_import_engine:filename>
                 </mathielen_import_engine:preconditions>
+                <mathielen_import_engine:object_factory type="default" class="Acme\DemoBundle\ValueObject\MyImportedRow" />
                 <mathielen_import_engine:source type="file" uri="/tmp/import.csv" format="csv" />
                 <mathielen_import_engine:validation>
-                    <mathielen_import_engine:source>
-                        <mathielen_import_engine:constraints field="header1">email</mathielen_import_engine:constraints>
-                        <mathielen_import_engine:constraints field="header2">url</mathielen_import_engine:constraints>
-                    </mathielen_import_engine:source>
-                    <mathielen_import_engine:target>
-                        <mathielen_import_engine:constraint field="header1">notempty</mathielen_import_engine:constraint>
-                        <mathielen_import_engine:constraint field="header2">notempty</mathielen_import_engine:constraint>
-                    </mathielen_import_engine:target>
+                    <mathielen_import_engine:target/>
                 </mathielen_import_engine:validation>
                 <mathielen_import_engine:target type="doctrine" entity="Acme\DemoBundle\Entity\MyImportedEntity" />
             </mathielen_import_engine:importer>

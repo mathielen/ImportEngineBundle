@@ -44,17 +44,15 @@ mathielen_import_engine:
             preconditions:
                 format: excel
                 filename: regexp1
+            object_factory:
+                type: default
+                class: Acme\DemoBundle\ValueObject\MyImportedRow
             source:
                 type: file
                 uri: /tmp/import.csv
                 format: csv
             validation:
-                source:
-                    header1: email
-                    header2: url
-                target:
-                    header1: notempty
-                    header2: notempty
+                target: ~
             target:
                 type: doctrine
                 entity: Acme\DemoBundle\Entity\MyImportedEntity

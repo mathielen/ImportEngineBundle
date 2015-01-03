@@ -1,29 +1,35 @@
 {
-	"name" : "mathielen/import-engine-bundle",
-	"type" : "symfony-bundle",
-	"description" : "A generic import (and export) -engine that provides easy to use yet powerful features",
-	"keywords" : [
-		"csv",
-		"import"
-	],
-	"homepage" : "https://github.com/mathielen/ImportEngineBundle",
-	"license" : "MIT",
-    "authors" : [{
-        "name" : "Markus Thielen",
-        "email" : "markus@logicx.de"
-    }],
-	"require" : {
-		"php" : ">=5.4.0",
-		"mathielen/import-engine" : "*",
-        "symfony/framework-bundle": "~2.3"
-	},
-    "require-dev" : {
-        "phpunit/phpunit" : "*"
-    },
-	"autoload" : {
-		"psr-0" : {
-			"Mathielen\\ImportEngineBundle" : ""
-		}
-	},
-	"target-dir" : "Mathielen/ImportEngineBundle"
+  "name": "mathielen/import-engine-bundle",
+  "type": "symfony-bundle",
+  "description": "A generic import (and export) -engine that provides easy to use yet powerful features",
+  "keywords": [
+    "csv",
+    "import"
+  ],
+  "homepage": "https://github.com/mathielen/ImportEngineBundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Markus Thielen",
+      "email": "markus@logicx.de"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "mathielen/import-engine": "*",
+    "symfony/framework-bundle": "~2.3"
+  },
+  "require-dev": {
+    "symfony/console": ">=2.2",
+    "phpunit/phpunit": "*"
+  },
+  "suggest": {
+    "symfony/console": "If you want to use the ImportCommand"
+  },
+  "autoload": {
+    "psr-0": {
+      "Mathielen\\ImportEngineBundle": ""
+    }
+  },
+  "target-dir": "Mathielen/ImportEngineBundle"
 }

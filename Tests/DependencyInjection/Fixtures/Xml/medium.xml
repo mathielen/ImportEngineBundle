@@ -1,0 +1,25 @@
+<container
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:mathielen_import_engine="http://example.org/schema/dic/mathielen_import_engine"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+        <mathielen_import_engine:config>
+
+            <mathielen_import_engine:importer name="minimum_importer">
+                <mathielen_import_engine:validation>
+                    <mathielen_import_engine:source>
+                        <mathielen_import_engine:constraints field="header1">email</mathielen_import_engine:constraints>
+                        <mathielen_import_engine:constraints field="header2">url</mathielen_import_engine:constraints>
+                    </mathielen_import_engine:source>
+                    <mathielen_import_engine:target>
+                        <mathielen_import_engine:constraint field="header1">notempty</mathielen_import_engine:constraint>
+                        <mathielen_import_engine:constraint field="header2">notempty</mathielen_import_engine:constraint>
+                    </mathielen_import_engine:target>
+                </mathielen_import_engine:validation>
+                <mathielen_import_engine:target type="file" uri="/tmp/myfile.csv" format="csv" />
+            </mathielen_import_engine:importer>
+
+        </mathielen_import_engine:config>
+
+</container>
