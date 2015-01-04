@@ -56,7 +56,7 @@ class ImportCommand extends ContainerAwareCommand
         $importRun = $importBuilder->build($importConfiguration, 'CLI');
 
         //copy info from storage to import run
-        if (!empty($input->getOption('context'))) {
+        if ($input->getOption('context') !== null) {
             $context = [];
             parse_str($input->getOption('context'), $context);
             $importRun->setContext($context);
