@@ -16,7 +16,7 @@
   ],
   "require": {
     "php": ">=5.4.0",
-    "mathielen/import-engine": "*",
+    "mathielen/import-engine": ">=0.5",
     "symfony/framework-bundle": "~2.3"
   },
   "require-dev": {

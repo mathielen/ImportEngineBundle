@@ -8,7 +8,6 @@ use Mathielen\ImportEngine\Import\Run\ImportRunner;
 use Mathielen\ImportEngine\Storage\StorageLocator;
 use Mathielen\ImportEngine\ValueObject\ImportConfiguration;
 use Mathielen\ImportEngine\ValueObject\ImportRun;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Table;
