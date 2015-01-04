@@ -15,12 +15,12 @@ class CompareTest extends \PHPUnit_Framework_TestCase
         $extension = new MathielenImportEngineExtension();
         $container = new ContainerBuilder();
         $container->registerExtension($extension);
-        $container->register('event_dispatcher', $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
-        $container->register('import_service', new MyDummyService()); //target service
-        $container->register('jms_serializer', $this->getMock('JMS\Serializer\SerializerInterface'));
-        $container->register('validator', $this->getMock('Symfony\Component\Validator\ValidatorInterface'));
-        $container->register('doctrine.orm.entity_manager', $this->getMock('Doctrine\ORM\EntityManagerInterface'));
-        $container->register('logger', $this->getMock('Psr\Log\LoggerInterface'));
+        $container->set('event_dispatcher', $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
+        $container->set('import_service', new MyDummyService()); //target service
+        $container->set('jms_serializer', $this->getMock('JMS\Serializer\SerializerInterface'));
+        $container->set('validator', $this->getMock('Symfony\Component\Validator\ValidatorInterface'));
+        $container->set('doctrine.orm.entity_manager', $this->getMock('Doctrine\ORM\EntityManagerInterface'));
+        $container->set('logger', $this->getMock('Psr\Log\LoggerInterface'));
 
         return $container;
     }

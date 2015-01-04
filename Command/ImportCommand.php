@@ -74,7 +74,7 @@ class ImportCommand extends ContainerAwareCommand
                 $progress->start();
             }
 
-            $progress->setCurrent($processed);
+            $progress->setProgress($processed);
         });
 
         /** @var ImportRunner $importRunner */
