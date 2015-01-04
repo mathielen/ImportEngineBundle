@@ -103,7 +103,7 @@ class ImportCommand extends ContainerAwareCommand
 
     private function parseSourceId($sourceId)
     {
-        if (preg_match('/[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)+/', $sourceId)) {
+        if (preg_match('/^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)+/', $sourceId)) {
             $parsedSourceId = parse_url($sourceId);
             if (array_key_exists('query', $parsedSourceId)) {
                 parse_str($parsedSourceId['query'], $parsedSourceId['query']);
