@@ -1,6 +1,7 @@
 <?php
 namespace Mathielen\ImportEngineBundle\Command;
 
+use Infrastructure\Utils;
 use Mathielen\DataImport\Event\ImportItemEvent;
 use Mathielen\ImportEngine\Exception\InvalidConfigurationException;
 use Mathielen\ImportEngine\Import\ImportBuilder;
@@ -11,6 +12,7 @@ use Mathielen\ImportEngine\ValueObject\ImportRun;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,6 +20,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ImportCommand extends ContainerAwareCommand
 {
+
+    const MAX_VIOLATION_ERRORS = 10;
 
     protected function configure()
     {
@@ -52,7 +56,7 @@ class ImportCommand extends ContainerAwareCommand
 
         /** @var ImportBuilder $importBuilder */
         $importBuilder = $this->getContainer()->get('mathielen_importengine.import.builder');
-        $importRun = $importBuilder->build($importConfiguration, 'CLI');
+        $importRun = $importBuilder->build($importConfiguration, Utils::whoAmI().'@CLI');
 
         //copy info from storage to import run
         if ($input->getOption('context') !== null) {
@@ -66,7 +70,8 @@ class ImportCommand extends ContainerAwareCommand
         $this->getContainer()->get('event_dispatcher')->addListener('data-import.read', function (ImportItemEvent $event) use ($output, &$progress) {
             /** @var ImportRun $importRun */
             $importRun = $event->getContext();
-            $processed = $importRun->getStatistics()['processed'];
+            $stats = $importRun->getStatistics();
+            $processed = array_key_exists('processed', $stats)?$stats['processed']:0;
             $max = $importRun->getInfo()['count'];
 
             if ($progress->getMaxSteps() != $max) {
@@ -86,19 +91,72 @@ class ImportCommand extends ContainerAwareCommand
         $output->writeln("<info>Import done</info>");
         $output->writeln('');
 
+        $this->writeStatistics($importRun->getStatistics(), new Table($output));
+
+        if ($importRun->getConfiguration()->getImport()) {
+            $this->writeValidationViolations(
+                $importRun
+                    ->getConfiguration()
+                    ->getImport()
+                    ->importer()
+                    ->validation()
+                    ->getViolations(),
+                new Table($output));
+        }
+
+        $output->writeln('');
+    }
+
+    private function writeValidationViolations(array $violations, Table $table)
+    {
+        $table
+            ->setHeaders(array('Type', 'Line', 'Violation'))
+        ;
+
+        $count = 0;
+        $count += $this->writeValidationViolationsType('source', $violations, $table);
+        $count += $this->writeValidationViolationsType('target', $violations, $table);
+
+        if ($count > 0) {
+            $table->render();
+        }
+    }
+
+    private function writeValidationViolationsType($type, array $violations, Table $table)
+    {
+        if (!array_key_exists($type, $violations)) {
+            return;
+        }
+
+        $i = 0;
+        foreach ($violations[$type] as $line=>$validations) {
+            foreach ($validations as $validation) {
+                $table->addRow(array($type, $line, $validation));
+                $i++;
+                if ($i == self::MAX_VIOLATION_ERRORS) {
+                    $table->addRow(new TableSeparator());
+                    $table->addRow(array(null, null, 'There are more errors...'));
+
+                    return $i;
+                }
+            }
+        }
+
+        return $i;
+    }
+
+    private function writeStatistics(array $statistics, Table $table)
+    {
         $rows = [];
-        foreach ($importRun->getStatistics() as $k=>$v) {
+        foreach ($statistics as $k=>$v) {
             $rows[] = [$k, $v];
         }
 
-        $table = new Table($output);
         $table
             ->setHeaders(array('Statistics'))
             ->setRows($rows)
         ;
         $table->render();
-
-        $output->writeln('');
     }
 
     private function parseSourceId($sourceId)

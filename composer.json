@@ -21,10 +21,12 @@
   },
   "require-dev": {
     "symfony/console": ">=2.2",
+    "logicx/glueframework": "dev-master",
     "phpunit/phpunit": "*"
   },
   "suggest": {
-    "symfony/console": "If you want to use the ImportCommand"
+    "symfony/console": "If you want to use the ImportCommand",
+    "logicx/glueframework": "If you want to use the ImportCommand"
   },
   "autoload": {
     "psr-0": {
