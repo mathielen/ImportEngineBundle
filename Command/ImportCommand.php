@@ -31,40 +31,53 @@ class ImportCommand extends ContainerAwareCommand
             ->addArgument('source_id', InputArgument::REQUIRED, "id of source. Different StorageProviders need different id data.\n- upload, directory: \"<path/to/file>\"\n- doctrine: \"<id of query>\"\n- service: \"<service>.<method>[?arguments_like_url_query]\"")
             ->addArgument('source_provider', InputArgument::OPTIONAL, 'id of source provider', 'default')
             ->addOption('context', 'c', InputOption::VALUE_OPTIONAL, 'Supply optional context information to import. Supply key-value data in query style: key=value&otherkey=othervalue&...')
+            ->addOption('limit', 'l', InputOption::VALUE_OPTIONAL, 'Limit imported rows')
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function validateInput(InputInterface $input)
     {
         if (!$this->getContainer()->has('mathielen_importengine.import.builder') ||
             !$this->getContainer()->has('mathielen_importengine.import.storagelocator') ||
             !$this->getContainer()->has('mathielen_importengine.import.runner')) {
             throw new InvalidConfigurationException("No importengine services have been found. Did you register the bundle in AppKernel and configured at least one importer in config?");
         }
+    }
 
-        $progress = new ProgressBar($output);
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->validateInput($input);
+
         $importerName = $input->getArgument('importer');
-        $sourceProvider = $input->getArgument('source_provider');
-        $sourceId = $this->parseSourceId($input->getArgument('source_id'));
+        $sourceProviderId = $input->getArgument('source_provider');
+        $sourceId = $input->getArgument('source_id');
+        $context = null;
+        if ($input->getOption('context')) {
+            $context = [];
+            parse_str($input->getOption('context'), $context);
+        }
+
+        $this->import($output, $importerName, $sourceProviderId, $sourceId, $context);
+    }
+
+    protected function import(OutputInterface $output, $importerName, $sourceProviderId, $sourceId, $context=null)
+    {
+        $output->writeln("Commencing import using importer <info>$importerName</info> with source provider <info>$sourceProviderId</info> and source id <info>$sourceId</info>");
+
+        $sourceId = $this->parseSourceId($sourceId);
+        $progress = new ProgressBar($output);
 
         /** @var StorageLocator $storageLocator */
         $storageLocator = $this->getContainer()->get('mathielen_importengine.import.storagelocator');
-        $storageSelection = $storageLocator->selectStorage($sourceProvider, $sourceId);
+        $storageSelection = $storageLocator->selectStorage($sourceProviderId, $sourceId);
         $importConfiguration = new ImportConfiguration($storageSelection, $importerName);
-
-        $output->writeln("Commencing import using importer <info>$importerName</info> with source provider <info>$sourceProvider</info> and source id <info>".$input->getArgument('source_id')."</info>");
 
         /** @var ImportBuilder $importBuilder */
         $importBuilder = $this->getContainer()->get('mathielen_importengine.import.builder');
         $importRun = $importBuilder->build($importConfiguration, Utils::whoAmI().'@CLI');
 
-        //copy info from storage to import run
-        if ($input->getOption('context') !== null) {
-            $context = [];
-            parse_str($input->getOption('context'), $context);
-            $importRun->setContext($context);
-        }
         $importRun->setInfo((array) $storageLocator->getStorage($storageSelection)->info());
+        $importRun->setContext($context);
 
         //status callback
         $this->getContainer()->get('event_dispatcher')->addListener('data-import.read', function (ImportItemEvent $event) use ($output, &$progress) {
@@ -107,7 +120,7 @@ class ImportCommand extends ContainerAwareCommand
         $output->writeln('');
     }
 
-    private function writeValidationViolations(array $violations, Table $table)
+    protected function writeValidationViolations(array $violations, Table $table)
     {
         $table
             ->setHeaders(array('Type', 'Line', 'Violation'))
@@ -122,10 +135,13 @@ class ImportCommand extends ContainerAwareCommand
         }
     }
 
+    /**
+     * @return int number of written violation messages
+     */
     private function writeValidationViolationsType($type, array $violations, Table $table)
     {
         if (!array_key_exists($type, $violations)) {
-            return;
+            return 0;
         }
 
         $i = 0;
@@ -145,7 +161,7 @@ class ImportCommand extends ContainerAwareCommand
         return $i;
     }
 
-    private function writeStatistics(array $statistics, Table $table)
+    protected function writeStatistics(array $statistics, Table $table)
     {
         $rows = [];
         foreach ($statistics as $k=>$v) {
