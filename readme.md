@@ -117,8 +117,14 @@ Usage
 
 ### On the command line
 
+#### Let the framework discover which importer suites best (auto discovery) ####
 ```bash
-$ app/console importengine:import your_importer_name /tmp/somedir/myfile.csv local
+$ app/console importengine:import /tmp/somedir/myfile.csv
+```
+
+#### Import myfile.csv with "your_importer_name" importer ####
+```bash
+$ app/console importengine:import -i your_importer_name /tmp/somedir/myfile.csv
 ```
 
 ### Within a controller / service

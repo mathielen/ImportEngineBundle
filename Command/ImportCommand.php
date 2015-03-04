@@ -1,8 +1,10 @@
 <?php
 namespace Mathielen\ImportEngineBundle\Command;
 
+use Ddeboer\DataImport\Filter\OffsetFilter;
 use Infrastructure\Utils;
 use Mathielen\DataImport\Event\ImportItemEvent;
+use Mathielen\ImportEngine\Event\ImportConfigureEvent;
 use Mathielen\ImportEngine\Exception\InvalidConfigurationException;
 use Mathielen\ImportEngine\Import\ImportBuilder;
 use Mathielen\ImportEngine\Import\Run\ImportRunner;
@@ -27,9 +29,9 @@ class ImportCommand extends ContainerAwareCommand
     {
         $this->setName('importengine:import')
             ->setDescription('Imports data with a definied importer')
-            ->addArgument('importer', InputArgument::REQUIRED, 'id/name of importer')
             ->addArgument('source_id', InputArgument::REQUIRED, "id of source. Different StorageProviders need different id data.\n- upload, directory: \"<path/to/file>\"\n- doctrine: \"<id of query>\"\n- service: \"<service>.<method>[?arguments_like_url_query]\"")
             ->addArgument('source_provider', InputArgument::OPTIONAL, 'id of source provider', 'default')
+            ->addOption('importer', 'i', InputOption::VALUE_OPTIONAL, 'id/name of importer')
             ->addOption('context', 'c', InputOption::VALUE_OPTIONAL, 'Supply optional context information to import. Supply key-value data in query style: key=value&otherkey=othervalue&...')
             ->addOption('limit', 'l', InputOption::VALUE_OPTIONAL, 'Limit imported rows')
         ;
@@ -48,7 +50,7 @@ class ImportCommand extends ContainerAwareCommand
     {
         $this->validateInput($input);
 
-        $importerName = $input->getArgument('importer');
+        $importerId = $input->getOption('importer');
         $sourceProviderId = $input->getArgument('source_provider');
         $sourceId = $input->getArgument('source_id');
         $context = null;
@@ -56,27 +58,50 @@ class ImportCommand extends ContainerAwareCommand
             $context = [];
             parse_str($input->getOption('context'), $context);
         }
+        $limit = $input->getOption('limit');
 
-        $this->import($output, $importerName, $sourceProviderId, $sourceId, $context);
+        $this->import($output, $importerId, $sourceProviderId, $sourceId, $context, $limit);
     }
 
-    protected function import(OutputInterface $output, $importerName, $sourceProviderId, $sourceId, $context=null)
+    protected function import(OutputInterface $output, $importerId, $sourceProviderId, $sourceId, $context=null, $limit=null)
     {
-        $output->writeln("Commencing import using importer <info>$importerName</info> with source provider <info>$sourceProviderId</info> and source id <info>$sourceId</info>");
+        $output->writeln("Commencing import using importer ".(empty($importerId)?'<comment>unknown</comment>':"<info>$importerId</info>")." with source provider <info>$sourceProviderId</info> and source id <info>$sourceId</info>");
 
         $sourceId = $this->parseSourceId($sourceId);
         $progress = new ProgressBar($output);
 
         /** @var StorageLocator $storageLocator */
         $storageLocator = $this->getContainer()->get('mathielen_importengine.import.storagelocator');
-        $storageSelection = $storageLocator->selectStorage($sourceProviderId, $sourceId);
-        $importConfiguration = new ImportConfiguration($storageSelection, $importerName);
 
         /** @var ImportBuilder $importBuilder */
         $importBuilder = $this->getContainer()->get('mathielen_importengine.import.builder');
+
+        $storageSelection = $storageLocator->selectStorage($sourceProviderId, $sourceId);
+        $storage = $storageLocator->getStorage($storageSelection);
+
+        //auto discovery
+        if (empty($importerId)) {
+            $importerId = $importBuilder->findImporterForStorage($storage);
+
+            if (!$importerId) {
+                $output->writeln('<error>Could not find importer for storage. Aborting.</error>');
+                exit();
+            }
+
+            $output->writeln("Source matched with preconditions of importer <info>$importerId</info>. Using this importer.");
+        }
+
+        //set limit
+        if ($limit) {
+            $this->getContainer()->get('event_dispatcher')->addListener(ImportConfigureEvent::AFTER_BUILD . '.' . $importerId, function (ImportConfigureEvent $event) use ($limit) {
+                $event->getImport()->importer()->filters()->add(new OffsetFilter(0, $limit));
+            });
+        }
+
+        $importConfiguration = new ImportConfiguration($storageSelection, $importerId);
         $importRun = $importBuilder->build($importConfiguration, Utils::whoAmI().'@CLI');
 
-        $importRun->setInfo((array) $storageLocator->getStorage($storageSelection)->info());
+        $importRun->setInfo((array) $storage->info());
         $importRun->setContext($context);
 
         //status callback

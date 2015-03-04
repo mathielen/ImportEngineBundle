@@ -10,7 +10,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $storageTypes = array('service', 'array', 'doctrine', 'file');
-        $providerTypes = array('directory', 'upload', 'doctrine', 'service');
+        $providerTypes = array('file', 'directory', 'upload', 'doctrine', 'service');
         $fileFormats = array('csv', 'excel', 'xml', 'yaml');
 
         $treeBuilder = new TreeBuilder();
