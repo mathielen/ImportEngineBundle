@@ -85,7 +85,7 @@ class ImportCommand extends ContainerAwareCommand
 
             if (!$importerId) {
                 $output->writeln('<error>Could not find importer for storage. Aborting.</error>');
-                exit();
+                return;
             }
 
             $output->writeln("Source matched with preconditions of importer <info>$importerId</info>. Using this importer.");

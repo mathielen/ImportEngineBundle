@@ -66,8 +66,8 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
     public function getRunData()
     {
         return array(
-            array(array('importer'=>'importer', 'source_id'=>'source_id', '--context'=>'key=value&otherkey=othervalue'), 'source_id'),
-            array(array('importer'=>'importer', 'source_id'=>'service.method?arg1=abc'), array('service'=>'service', 'method'=>'method', 'arguments'=>array('arg1'=>'abc')))
+            array(array('source_id'=>'source_id', '--context'=>'key=value&otherkey=othervalue'), 'source_id'),
+            array(array('source_id'=>'service.method?arg1=abc'), array('service'=>'service', 'method'=>'method', 'arguments'=>array('arg1'=>'abc')))
         );
     }
 

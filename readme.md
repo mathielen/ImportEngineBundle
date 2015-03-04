@@ -11,7 +11,7 @@ Mathielen Import Engine Bundle
 Introduction
 ------------
 This is a bundle for the [mathielen/import-engine library](https://github.com/mathielen/import-engine).
-It provides an easy way to configure a full-blown data importer for you symfony2 project.
+It provides an easy way to configure a full-blown data importer for your symfony2 project.
 
 Installation
 ------------
