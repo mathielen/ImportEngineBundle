@@ -6,16 +6,14 @@
 
 	<services>
 
-		<service id="mathielen_importengine.importer.format_discoverer" class="Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy">
-		</service>
+		<service id="mathielen_importengine.importer.format_discoverer" class="Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy" />
 
 		<service id="mathielen_importengine.importer.repository" class="Mathielen\ImportEngine\Importer\ImporterRepository" public="false">
             <argument type="service" id="logger" />
             <tag name="monolog.logger" channel="mathielen_importengine.importer" />
 		</service>
 
-        <service id="mathielen_importengine.import.storagelocator" class="Mathielen\ImportEngine\Storage\StorageLocator">
-        </service>
+        <service id="mathielen_importengine.import.storagelocator" class="Mathielen\ImportEngine\Storage\StorageLocator" />
 
         <service id="mathielen_importengine.import.builder" class="Mathielen\ImportEngine\Import\ImportBuilder">
             <argument type="service" id="mathielen_importengine.importer.repository" />
@@ -27,6 +25,21 @@
             <argument type="service">
                 <service  class="Mathielen\ImportEngine\Import\Workflow\DefaultWorkflowFactory">
                     <argument type="service" id="event_dispatcher" />
+                </service>
+            </argument>
+        </service>
+
+        <service id="mathielen_importengine.generator.valueobject" class="Mathielen\ImportEngineBundle\Generator\ValueObjectGenerator" />
+
+        <service id="mathielen_importengine.generator.valueobject.fieldformatguesser" class="Mathielen\ImportEngineBundle\Generator\ValueObject\FieldFormatGuesser" />
+
+        <service id="mathielen_importengine.generator.valueobject.importer" class="Mathielen\ImportEngine\Importer\Importer">
+            <argument type="service">
+                <service  class="Mathielen\ImportEngine\Storage\ServiceStorage">
+                    <argument type="collection">
+                        <argument type="service" id="mathielen_importengine.generator.valueobject.fieldformatguesser" />
+                        <argument>putRow</argument>
+                    </argument>
                 </service>
             </argument>
         </service>

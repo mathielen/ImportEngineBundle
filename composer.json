@@ -22,7 +22,8 @@
   "require-dev": {
     "symfony/console": ">=2.2",
     "logicx/glueframework": "dev-master",
-    "phpunit/phpunit": "*"
+    "phpunit/phpunit": "*",
+    "sensio/generator-bundle": "~2.3"
   },
   "suggest": {
     "symfony/console": "If you want to use the ImportCommand",

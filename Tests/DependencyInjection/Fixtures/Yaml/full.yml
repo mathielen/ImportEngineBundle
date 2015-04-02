@@ -3,9 +3,12 @@ mathielen_import_engine:
         upload:
             type: upload
             uri: /tmp/uploaddir
-        local:
+        localdir:
             type: directory
             uri: /tmp/cached
+        localfile:
+            type: file
+            uri: /tmp/cached/file
         doctrine:
             type: doctrine
             queries:

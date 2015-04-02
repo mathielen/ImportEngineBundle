@@ -1,0 +1,20 @@
+<?php
+namespace {{ namespace }};
+
+use JMS\Serializer\Annotation\Type;
+use Symfony\Component\Validator\Constraints as Assert;
+
+class {{ class }}
+{
+
+{% for field_name, field_definition in field_definitions %}
+    /**
+     * @Type("{{ field_definition['type'] }}")
+{% if field_definition['empty'] == false %}
+     * @Assert\NotBlank
+{% endif %}
+     */
+    private ${{ field_name }};
+
+{% endfor -%}
+}

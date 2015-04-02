@@ -9,9 +9,13 @@
                 <mathielen_import_engine:type>upload</mathielen_import_engine:type>
                 <mathielen_import_engine:uri>/tmp/uploaddir</mathielen_import_engine:uri>
             </mathielen_import_engine:storageprovider>
-            <mathielen_import_engine:storageprovider name="local">
+            <mathielen_import_engine:storageprovider name="localdir">
                 <mathielen_import_engine:type>directory</mathielen_import_engine:type>
                 <mathielen_import_engine:uri>/tmp/cached</mathielen_import_engine:uri>
+            </mathielen_import_engine:storageprovider>
+            <mathielen_import_engine:storageprovider name="localfile">
+                <mathielen_import_engine:type>file</mathielen_import_engine:type>
+                <mathielen_import_engine:uri>/tmp/cached/file</mathielen_import_engine:uri>
             </mathielen_import_engine:storageprovider>
             <mathielen_import_engine:storageprovider name="doctrine">
                 <mathielen_import_engine:type>doctrine</mathielen_import_engine:type>
