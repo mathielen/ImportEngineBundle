@@ -45,7 +45,7 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
         $this->container->get('mathielen_importengine.import.builder')
             ->expects($this->once())
             ->method('build')
-            ->with(new ImportRequest($parsedSourceId, 'default', null, 'root@CLI'))
+            ->with(new ImportRequest($parsedSourceId, 'default', null, 'travis@CLI'))
             ->will($this->returnValue(
                 new Import(
                     new Importer(
