@@ -34,6 +34,9 @@ mathielen_import_engine:
             object_factory:
                 type: jms_serializer
                 class: Acme\DemoBundle\ValueObject\MyImportedRow
+            converters:
+                header1: some.converter.serviceid
+                header2: some.other.converter.serviceid
             validation:
                 options:
                     allowExtraFields: false

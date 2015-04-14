@@ -84,6 +84,11 @@ mathielen_import_engine:
                 type: jms_serializer        #[jms_serializer, default]
                 class: Acme\DemoBundle\ValueObject\MyImportedRow
 
+            #add fieldlevel converters
+            converters:
+                "field1-in-source": mathielen_importengine.converter.excel.genericdate    #converts excel's date-field to a Y-m-d string
+                "field2-in-source": my.own.converter.service
+
             #validate imported data
             validation:
                 source:                     #add constraints to source fields

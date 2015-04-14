@@ -53,6 +53,7 @@ class Configuration implements ConfigurationInterface
                         ->requiresAtLeastOneElement()
                         ->useAttributeAsKey('name')
                         ->prototype('array')
+                            ->fixXmlConfig('converter') //allows <converter> instead of <converters>
                             ->children()
                                 ->arrayNode('preconditions')
                                     ->fixXmlConfig('field')  //allows <field> instead of <fields>
@@ -92,6 +93,11 @@ class Configuration implements ConfigurationInterface
                                         ->scalarNode('class')
                                         ->end()
                                     ->end()
+                                ->end()
+
+                                ->arrayNode('converters')
+                                    ->useAttributeAsKey('field')
+                                    ->prototype('scalar')->end()
                                 ->end()
 
                                 ->arrayNode('source')

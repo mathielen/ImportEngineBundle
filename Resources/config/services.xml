@@ -6,9 +6,16 @@
 
 	<services>
 
+        <service id="mathielen_importengine.converter.genericdate" class="Mathielen\DataImport\ValueConverter\GenericDateItemConverter">
+            <argument>Y-m-d</argument>
+        </service>
+        <service id="mathielen_importengine.converter.excel.genericdate" class="Mathielen\DataImport\ValueConverter\ExcelGenericDateItemConverter">
+            <argument>Y-m-d</argument>
+        </service>
+
 		<service id="mathielen_importengine.importer.format_discoverer" class="Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy" />
 
-		<service id="mathielen_importengine.importer.repository" class="Mathielen\ImportEngine\Importer\ImporterRepository" public="false">
+		<service id="mathielen_importengine.importer.repository" class="Mathielen\ImportEngine\Importer\ImporterRepository">
             <argument type="service" id="logger" />
             <tag name="monolog.logger" channel="mathielen_importengine.importer" />
 		</service>

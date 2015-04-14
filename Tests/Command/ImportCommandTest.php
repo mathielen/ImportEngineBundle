@@ -1,9 +1,11 @@
 <?php
 namespace Mathielen\ImportEngineBundle\Tests\Command;
 
+use Mathielen\ImportEngine\Import\Import;
+use Mathielen\ImportEngine\Importer\Importer;
 use Mathielen\ImportEngine\ValueObject\ImportConfiguration;
+use Mathielen\ImportEngine\ValueObject\ImportRequest;
 use Mathielen\ImportEngine\ValueObject\ImportRun;
-use Mathielen\ImportEngine\ValueObject\StorageSelection;
 use Mathielen\ImportEngineBundle\Command\ImportCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\Output;
@@ -24,23 +26,12 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $sl = $this->getMockBuilder('Mathielen\ImportEngine\Storage\StorageLocator')->disableOriginalConstructor()->getMock();
         $ib = $this->getMockBuilder('Mathielen\ImportEngine\Import\ImportBuilder')->disableOriginalConstructor()->getMock();
 
         $this->container = new ContainerBuilder();
         $this->container->set('event_dispatcher', $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
         $this->container->set('mathielen_importengine.import.builder', $ib);
-        $this->container->set('mathielen_importengine.import.storagelocator', $sl);
         $this->container->set('mathielen_importengine.import.runner', $this->getMockBuilder('Mathielen\ImportEngine\Import\Run\ImportRunner')->disableOriginalConstructor()->getMock());
-
-        $sl
-            ->expects($this->any())
-            ->method('getStorage')
-            ->will($this->returnValue($this->getMock('Mathielen\ImportEngine\Storage\StorageInterface')));
-        $ib
-            ->expects($this->any())
-            ->method('build')
-            ->will($this->returnValue(new ImportRun(new ImportConfiguration())));
 
         $this->command = new ImportCommand();
         $this->command->setContainer($this->container);
@@ -51,11 +42,19 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testRun(array $input, $parsedSourceId)
     {
-        $this->container->get('mathielen_importengine.import.storagelocator')
+        $this->container->get('mathielen_importengine.import.builder')
             ->expects($this->once())
-            ->method('selectStorage')
-            ->with(array_key_exists('source_provider', $input)?$input['source_provider']:'default', $parsedSourceId)
-            ->will($this->returnValue(new StorageSelection('impl')));
+            ->method('build')
+            ->with(new ImportRequest($parsedSourceId, 'default', null, 'root@CLI'))
+            ->will($this->returnValue(
+                new Import(
+                    new Importer(
+                        $this->getMock('Mathielen\ImportEngine\Storage\StorageInterface')
+                    ),
+                    $this->getMock('Mathielen\ImportEngine\Storage\StorageInterface'),
+                    new ImportRun(new ImportConfiguration())
+                )
+            ));
 
         $input = new ArrayInput($input, $this->command->getDefinition());
         $output = new TestOutput();

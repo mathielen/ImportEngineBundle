@@ -8,8 +8,7 @@ use Mathielen\ImportEngine\Event\ImportConfigureEvent;
 use Mathielen\ImportEngine\Exception\InvalidConfigurationException;
 use Mathielen\ImportEngine\Import\ImportBuilder;
 use Mathielen\ImportEngine\Import\Run\ImportRunner;
-use Mathielen\ImportEngine\Storage\StorageLocator;
-use Mathielen\ImportEngine\ValueObject\ImportConfiguration;
+use Mathielen\ImportEngine\ValueObject\ImportRequest;
 use Mathielen\ImportEngine\ValueObject\ImportRun;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -40,7 +39,6 @@ class ImportCommand extends ContainerAwareCommand
     protected function validateInput(InputInterface $input)
     {
         if (!$this->getContainer()->has('mathielen_importengine.import.builder') ||
-            !$this->getContainer()->has('mathielen_importengine.import.storagelocator') ||
             !$this->getContainer()->has('mathielen_importengine.import.runner')) {
             throw new InvalidConfigurationException("No importengine services have been found. Did you register the bundle in AppKernel and configured at least one importer in config?");
         }
@@ -70,28 +68,6 @@ class ImportCommand extends ContainerAwareCommand
         $sourceId = $this->parseSourceId($sourceId);
         $progress = new ProgressBar($output);
 
-        /** @var StorageLocator $storageLocator */
-        $storageLocator = $this->getContainer()->get('mathielen_importengine.import.storagelocator');
-
-        /** @var ImportBuilder $importBuilder */
-        $importBuilder = $this->getContainer()->get('mathielen_importengine.import.builder');
-
-        $storageSelection = $storageLocator->selectStorage($sourceProviderId, $sourceId);
-        $storage = $storageLocator->getStorage($storageSelection);
-
-        //auto discovery
-        if (empty($importerId)) {
-            $importerId = $importBuilder->findImporterForStorage($storage);
-
-            if (!$importerId) {
-                $output->writeln('<error>Could not find importer for storage. Aborting.</error>');
-
-                return;
-            }
-
-            $output->writeln("Source matched with preconditions of importer <info>$importerId</info>. Using this importer.");
-        }
-
         //set limit
         if ($limit) {
             $this->getContainer()->get('event_dispatcher')->addListener(ImportConfigureEvent::AFTER_BUILD . '.' . $importerId, function (ImportConfigureEvent $event) use ($limit) {
@@ -99,10 +75,15 @@ class ImportCommand extends ContainerAwareCommand
             });
         }
 
-        $importConfiguration = new ImportConfiguration($storageSelection, $importerId);
-        $importRun = $importBuilder->build($importConfiguration, Utils::whoAmI().'@CLI');
+        /** @var ImportBuilder $importBuilder */
+        $importBuilder = $this->getContainer()->get('mathielen_importengine.import.builder');
 
-        $importRun->setInfo((array) $storage->info());
+        $importRequest = new ImportRequest($sourceId, $sourceProviderId, $importerId, Utils::whoAmI().'@CLI');
+
+        $import = $importBuilder->build($importRequest);
+
+        //apply context info from commandline
+        $importRun = $import->getRun();
         $importRun->setContext($context);
 
         //status callback
@@ -123,7 +104,7 @@ class ImportCommand extends ContainerAwareCommand
 
         /** @var ImportRunner $importRunner */
         $importRunner = $this->getContainer()->get('mathielen_importengine.import.runner');
-        $importRunner->run($importRun);
+        $importRunner->run($import);
 
         $progress->finish();
         $output->writeln('');
@@ -132,16 +113,12 @@ class ImportCommand extends ContainerAwareCommand
 
         $this->writeStatistics($importRun->getStatistics(), new Table($output));
 
-        if ($importRun->getConfiguration()->getImport()) {
-            $this->writeValidationViolations(
-                $importRun
-                    ->getConfiguration()
-                    ->getImport()
-                    ->importer()
-                    ->validation()
-                    ->getViolations(),
-                new Table($output));
-        }
+        $this->writeValidationViolations(
+            $import
+                ->importer()
+                ->validation()
+                ->getViolations(),
+            new Table($output));
 
         $output->writeln('');
     }

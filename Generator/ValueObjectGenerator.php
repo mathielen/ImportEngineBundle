@@ -2,7 +2,6 @@
 namespace Mathielen\ImportEngineBundle\Generator;
 
 use Sensio\Bundle\GeneratorBundle\Generator\Generator;
-use Symfony\Component\Filesystem\Filesystem;
 
 class ValueObjectGenerator extends Generator
 {

@@ -1,32 +1,10 @@
 <?php
 namespace Mathielen\ImportEngineBundle\Tests\DependencyInjection;
 
-use Mathielen\ImportEngineBundle\DependencyInjection\MathielenImportEngineExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractExtensionTest extends AbstractTest
 {
-    private $extension;
-
-    /**
-     * @var ContainerBuilder
-     */
-    private $container;
-
-    protected function setUp()
-    {
-        $this->extension = new MathielenImportEngineExtension();
-
-        $this->container = new ContainerBuilder();
-        $this->container->registerExtension($this->extension);
-        $this->container->set('event_dispatcher', $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
-        $this->container->set('logger', $this->getMock('Psr\Log\LoggerInterface'));
-        $this->container->set('import_service', new MyImportService()); //target service
-        $this->container->set('jms_serializer', $this->getMock('JMS\Serializer\SerializerInterface'));
-        $this->container->set('validator', $this->getMock('Symfony\Component\Validator\ValidatorInterface'));
-        $this->container->set('doctrine.orm.entity_manager', $this->getMock('Doctrine\ORM\EntityManagerInterface'));
-        $this->container->set('logger', $this->getMock('Psr\Log\LoggerInterface'));
-    }
 
     abstract protected function loadConfiguration(ContainerBuilder $container, $resource);
 
@@ -86,8 +64,4 @@ abstract class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(['upload', 'localdir', 'localfile', 'doctrine', 'services'], $registeredStorageProviderIds);
     }
-}
-
-class MyImportService
-{
 }

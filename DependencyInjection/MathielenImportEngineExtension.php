@@ -116,7 +116,38 @@ class MathielenImportEngineExtension extends Extension
             $this->generateValidationDef($importConfig['validation'], $importerDef, $objectFactoryDef);
         }
 
+        //add converters?
+        if (array_key_exists('converters', $importConfig)) {
+            $this->generateTransformerDef($importConfig['converters'], $importerDef);
+        }
+
         return $importerDef;
+    }
+
+    private function generateTransformerDef(array $converterOptions, Definition $importerDef)
+    {
+        $mappingsDef = new Definition('Mathielen\ImportEngine\Mapping\Mappings');
+
+        //set converters
+        foreach ($converterOptions as $field=>$converterServiceId) {
+            $mappingsDef->addMethodCall('setConverter', array(
+                new Reference($converterServiceId),
+                $field
+            ));
+        }
+
+        $mappingFactoryDef = new Definition('Mathielen\ImportEngine\Mapping\DefaultMappingFactory', array(
+            $mappingsDef
+        ));
+
+        $transformerDef = new Definition('Mathielen\ImportEngine\Transformation\Transformation');
+        $transformerDef->addMethodCall('setMappingFactory', array(
+            $mappingFactoryDef
+        ));
+
+        $importerDef->addMethodCall('transformation', array(
+            $transformerDef
+        ));
     }
 
     private function generateValidatorDef(array $options)
@@ -250,7 +281,7 @@ class MathielenImportEngineExtension extends Extension
 
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\LocalFileStorage', array(
                     $fileDef,
-                    new Definition("Mathielen\ImportEngine\Storage\Format\\".ucfirst($config['format'])."Format")
+                    new Definition('Mathielen\ImportEngine\Storage\Format\\'.ucfirst($config['format'])."Format")
                 ));
 
                 break;
