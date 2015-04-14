@@ -132,6 +132,11 @@ $ app/console importengine:import /tmp/somedir/myfile.csv
 $ app/console importengine:import -i your_importer_name /tmp/somedir/myfile.csv
 ```
 
+#### Generate a [JMS Serializer](http://jmsyst.com/libs/serializer)-Annotated ValueObject class for an arbitrary import source (ie. a file)
+```bash
+$ app/console importengine:generate:valueobject data/myfile.csv Acme\\ValueObject\\MyFileRow src
+```
+
 ### Within a controller / service
 
 ```php
