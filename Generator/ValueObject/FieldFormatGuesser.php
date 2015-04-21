@@ -32,8 +32,8 @@ class FieldFormatGuesser
     private function getOrCreateFieldGuess($fieldname)
     {
         $fieldname = strtolower($fieldname);
-        if (!array_key_exists($fieldname, $this->fields)) {
-            $this->fields[$fieldname] = new FieldFormatGuess($fieldname);
+        if (!isset($this->fields[$fieldname])) {
+            $this->fields[$fieldname] = new FieldFormatGuess();
         }
 
         return $this->fields[$fieldname];

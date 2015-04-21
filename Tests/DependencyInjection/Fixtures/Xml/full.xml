@@ -44,8 +44,9 @@
                     <mathielen_import_engine:filename>regexp2</mathielen_import_engine:filename>
                 </mathielen_import_engine:preconditions>
                 <mathielen_import_engine:object_factory type="jms_serializer" class="Acme\DemoBundle\ValueObject\MyImportedRow" />
-                <mathielen_import_engine:converter field="header1">some.converter.serviceid</mathielen_import_engine:converter>
-                <mathielen_import_engine:converter field="header2">some.other.converter.serviceid</mathielen_import_engine:converter>
+                <mathielen_import_engine:mapping from="header1" to="targetField1" converter="some.converter.serviceid" />
+                <mathielen_import_engine:mapping from="header2" converter="some.other.converter.serviceid" />
+                <mathielen_import_engine:mapping from="header3" to="targetField3" />
                 <mathielen_import_engine:validation>
                     <mathielen_import_engine:options allowExtraFields="false" allowMissingFields="true" />
                     <mathielen_import_engine:target/>

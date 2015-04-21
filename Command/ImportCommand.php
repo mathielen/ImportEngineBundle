@@ -33,6 +33,7 @@ class ImportCommand extends ContainerAwareCommand
             ->addOption('importer', 'i', InputOption::VALUE_OPTIONAL, 'id/name of importer')
             ->addOption('context', 'c', InputOption::VALUE_OPTIONAL, 'Supply optional context information to import. Supply key-value data in query style: key=value&otherkey=othervalue&...')
             ->addOption('limit', 'l', InputOption::VALUE_OPTIONAL, 'Limit imported rows')
+            ->addOption('dryrun', null, InputOption::VALUE_NONE, 'Do not import - Validation only')
         ;
     }
 
@@ -51,6 +52,7 @@ class ImportCommand extends ContainerAwareCommand
         $importerId = $input->getOption('importer');
         $sourceProviderId = $input->getArgument('source_provider');
         $sourceId = $input->getArgument('source_id');
+        $isDryrun = $input->getOption('dryrun');
         $context = null;
         if ($input->getOption('context')) {
             $context = [];
@@ -58,12 +60,12 @@ class ImportCommand extends ContainerAwareCommand
         }
         $limit = $input->getOption('limit');
 
-        $this->import($output, $importerId, $sourceProviderId, $sourceId, $context, $limit);
+        $this->import($output, $importerId, $sourceProviderId, $sourceId, $context, $limit, $isDryrun);
     }
 
-    protected function import(OutputInterface $output, $importerId, $sourceProviderId, $sourceId, $context=null, $limit=null)
+    protected function import(OutputInterface $output, $importerId, $sourceProviderId, $sourceId, $context=null, $limit=null, $isDryrun=false)
     {
-        $output->writeln("Commencing import using importer ".(empty($importerId)?'<comment>unknown</comment>':"<info>$importerId</info>")." with source provider <info>$sourceProviderId</info> and source id <info>$sourceId</info>");
+        $output->writeln("Commencing ".($isDryrun?'<comment>dry-run</comment> ':'')."import using importer ".(empty($importerId)?'<comment>unknown</comment>':"<info>$importerId</info>")." with source provider <info>$sourceProviderId</info> and source id <info>$sourceId</info>");
 
         $sourceId = $this->parseSourceId($sourceId);
         $progress = new ProgressBar($output);
@@ -104,7 +106,11 @@ class ImportCommand extends ContainerAwareCommand
 
         /** @var ImportRunner $importRunner */
         $importRunner = $this->getContainer()->get('mathielen_importengine.import.runner');
-        $importRunner->run($import);
+        if ($isDryrun) {
+            $importRunner->dryRun($import);
+        } else {
+            $importRunner->run($import);
+        }
 
         $progress->finish();
         $output->writeln('');

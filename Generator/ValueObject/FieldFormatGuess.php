@@ -4,18 +4,12 @@ namespace Mathielen\ImportEngineBundle\Generator\ValueObject;
 class FieldFormatGuess
 {
 
-    private $name;
     private $hasBlankValues = false;
 
     /**
      * @var array
      */
     private $typeDistribution = array();
-
-    public function __construct($name)
-    {
-        $this->name = $name;
-    }
 
     private function guessValueType($value)
     {

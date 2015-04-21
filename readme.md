@@ -84,10 +84,20 @@ mathielen_import_engine:
                 type: jms_serializer        #[jms_serializer, default]
                 class: Acme\DemoBundle\ValueObject\MyImportedRow
 
-            #add fieldlevel converters
-            converters:
-                "field1-in-source": mathielen_importengine.converter.excel.genericdate    #converts excel's date-field to a Y-m-d string
-                "field2-in-source": my.own.converter.service
+            #add mapping
+            mappings:
+                #simple a-to-b mapping
+                source-field1: target-field1
+                
+                #convert the field (but dont map)
+                source-field2: 
+                    #converts excel's date-field to a Y-m-d string (you can use your own service-id here)
+                    converter: mathielen_importengine.converter.excel.genericdate
+                        
+                #map and convert
+                source-field3:
+                    to: target-field3
+                    converter: upperCase    #use a converter that was registered with the converter-provider
 
             #validate imported data
             validation:

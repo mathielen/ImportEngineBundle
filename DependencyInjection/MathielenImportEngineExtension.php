@@ -117,32 +117,51 @@ class MathielenImportEngineExtension extends Extension
         }
 
         //add converters?
-        if (array_key_exists('converters', $importConfig)) {
-            $this->generateTransformerDef($importConfig['converters'], $importerDef);
+        if (array_key_exists('mappings', $importConfig)) {
+            $this->generateTransformerDef($importConfig['mappings'], $importerDef);
         }
 
         return $importerDef;
     }
 
-    private function generateTransformerDef(array $converterOptions, Definition $importerDef)
+    private function generateTransformerDef(array $mappingOptions, Definition $importerDef)
     {
         $mappingsDef = new Definition('Mathielen\ImportEngine\Mapping\Mappings');
 
         //set converters
-        foreach ($converterOptions as $field=>$converterServiceId) {
-            $mappingsDef->addMethodCall('setConverter', array(
-                new Reference($converterServiceId),
-                $field
+        foreach ($mappingOptions as $field=>$fieldMapping) {
+            $converter = null;
+            if (array_key_exists('converter', $fieldMapping)) {
+                $converter = $fieldMapping['converter'];
+            }
+
+            if (array_key_exists('to', $fieldMapping)) {
+                $mappingsDef->addMethodCall('add', array(
+                    $field,
+                    $fieldMapping['to'],
+                    $converter
             ));
+            } elseif ($converter) {
+                $mappingsDef->addMethodCall('setConverter', array(
+                    $converter,
+                    $field
+                ));
+            }
         }
 
         $mappingFactoryDef = new Definition('Mathielen\ImportEngine\Mapping\DefaultMappingFactory', array(
             $mappingsDef
         ));
+        $converterProviderDef = new Definition('Mathielen\ImportEngine\Mapping\Converter\Provider\ContainerAwareConverterProvider', array(
+            new Reference('service_container')
+        ));
 
         $transformerDef = new Definition('Mathielen\ImportEngine\Transformation\Transformation');
         $transformerDef->addMethodCall('setMappingFactory', array(
             $mappingFactoryDef
+        ));
+        $transformerDef->addMethodCall('setConverterProvider', array(
+            $converterProviderDef
         ));
 
         $importerDef->addMethodCall('transformation', array(
@@ -167,7 +186,7 @@ class MathielenImportEngineExtension extends Extension
         $validationDef = new Definition('Mathielen\ImportEngine\Validation\ValidatorValidation', array(
             new Reference('validator')
         ));
-        $importerDef->addMethodCall('setValidation', array(
+        $importerDef->addMethodCall('validation', array(
             $validationDef
         ));
 

@@ -1,6 +1,7 @@
 <?php
 namespace Mathielen\ImportEngineBundle\Tests\Command;
 
+use Infrastructure\Utils;
 use Mathielen\ImportEngine\Import\Import;
 use Mathielen\ImportEngine\Importer\Importer;
 use Mathielen\ImportEngine\ValueObject\ImportConfiguration;
@@ -45,7 +46,7 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
         $this->container->get('mathielen_importengine.import.builder')
             ->expects($this->once())
             ->method('build')
-            ->with(new ImportRequest($parsedSourceId, 'default', null, 'travis@CLI'))
+            ->with(new ImportRequest($parsedSourceId, 'default', null, Utils::whoAmI().'@CLI'))
             ->will($this->returnValue(
                 new Import(
                     new Importer(

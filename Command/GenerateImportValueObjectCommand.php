@@ -67,9 +67,6 @@ EOT
         if (!is_dir($path) || !is_writable($path)) {
             throw new \RuntimeException(sprintf('The directory "%s" is not a directory or cannot be written to.', $path));
         }
-        /*if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $clsName)) {
-            throw new \RuntimeException(sprintf('The classname "%s" is invalid.', $clsName));
-        }*/
 
         /** @var StorageLocator $storageLocator */
         $storageLocator = $this->getContainer()->get('mathielen_importengine.import.storagelocator');
