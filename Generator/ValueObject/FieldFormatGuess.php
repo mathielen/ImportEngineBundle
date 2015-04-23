@@ -32,11 +32,11 @@ class FieldFormatGuess
 
     public function addValue($value)
     {
-        if ($value === '') {
+        if ($value == '') {
             $this->hasBlankValues = true;
         } else {
             $type = $this->guessValueType($value);
-            array_key_exists($type, $this->typeDistribution) ? $this->typeDistribution[$type]++ : $this->typeDistribution[$type] = 1;
+            isset($this->typeDistribution[$type]) ? $this->typeDistribution[$type]++ : $this->typeDistribution[$type] = 1;
         }
     }
 
@@ -50,8 +50,8 @@ class FieldFormatGuess
         } elseif ($distributionCount == 0) {
             $guessedType = $defaultFieldFormat;
         } else {
-            $types = sort($this->typeDistribution);
-            $guessedType = $types[0];
+            arsort($this->typeDistribution);
+            $guessedType = array_keys($this->typeDistribution)[0];
         }
 
         return array(

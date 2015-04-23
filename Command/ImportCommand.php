@@ -53,10 +53,11 @@ class ImportCommand extends ContainerAwareCommand
         $sourceProviderId = $input->getArgument('source_provider');
         $sourceId = $input->getArgument('source_id');
         $isDryrun = $input->getOption('dryrun');
-        $context = null;
-        if ($input->getOption('context')) {
-            $context = [];
-            parse_str($input->getOption('context'), $context);
+        if ($context = $input->getOption('context')) {
+            //parse key=value&key=value string to array
+            if (strpos($context, '=') !== false) {
+                parse_str($input->getOption('context'), $context);
+            }
         }
         $limit = $input->getOption('limit');
 

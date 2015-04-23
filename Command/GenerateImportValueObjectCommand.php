@@ -7,7 +7,6 @@ use Mathielen\ImportEngine\Importer\Importer;
 use Mathielen\ImportEngine\Storage\Format\Discovery\FileExtensionDiscoverStrategy;
 use Mathielen\ImportEngine\Storage\StorageInterface;
 use Mathielen\ImportEngine\Storage\StorageLocator;
-use Mathielen\ImportEngine\ValueObject\ImportConfiguration;
 use Mathielen\ImportEngineBundle\Generator\ValueObject\FieldFormatGuesser;
 use Mathielen\ImportEngineBundle\Generator\ValueObjectGenerator;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -97,16 +96,11 @@ EOT
     {
         /** @var Importer $importer */
         $importer = $this->getContainer()->get('mathielen_importengine.generator.valueobject.importer');
-        $import = Import::build($importer);
-        $import->setSourceStorage($storage);
-
-        $importConfiguration = new ImportConfiguration();
-        $importConfiguration->setImport($import);
-        $importRun = $importConfiguration->toRun();
+        $import = Import::build($importer, $storage);
 
         /** @var ImportRunner $importRunner */
         $importRunner = $this->getContainer()->get('mathielen_importengine.import.runner');
-        $importRunner->run($importRun);
+        $importRunner->run($import);
 
         /** @var FieldFormatGuesser $fieldformatguesser */
         $fieldformatguesser = $this->getContainer()->get('mathielen_importengine.generator.valueobject.fieldformatguesser');

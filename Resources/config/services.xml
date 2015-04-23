@@ -12,6 +12,12 @@
         <service id="mathielen_importengine.converter.excel.genericdate" class="Mathielen\DataImport\ValueConverter\ExcelGenericDateItemConverter">
             <argument>Y-m-d</argument>
         </service>
+        <service id="mathielen_importengine.converter.contextsupply" class="Mathielen\DataImport\ItemConverter\ContextSupplyConverter">
+            <tag name="kernel.event_subscriber" />
+        </service>
+        <service id="mathielen_importengine.converter.contextmerge" class="Mathielen\DataImport\ItemConverter\ContextMergeConverter">
+            <tag name="kernel.event_subscriber" />
+        </service>
 
 		<service id="mathielen_importengine.importer.format_discoverer" class="Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy" />
 
@@ -34,6 +40,7 @@
                     <argument type="service" id="event_dispatcher" />
                 </service>
             </argument>
+            <argument type="service" id="event_dispatcher" />
         </service>
 
         <service id="mathielen_importengine.generator.valueobject" class="Mathielen\ImportEngineBundle\Generator\ValueObjectGenerator" />
