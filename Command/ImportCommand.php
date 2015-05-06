@@ -187,9 +187,11 @@ class ImportCommand extends ContainerAwareCommand
 
     private function parseSourceId($sourceId)
     {
-        if (preg_match('/^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)+/', $sourceId)) {
+        if (is_file($sourceId)) {
+            return $sourceId;
+        } elseif (preg_match('/^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)+/', $sourceId)) {
             $parsedSourceId = parse_url($sourceId);
-            if (array_key_exists('query', $parsedSourceId)) {
+            if (isset($parsedSourceId['query'])) {
                 parse_str($parsedSourceId['query'], $parsedSourceId['query']);
             }
             $pathTokens = explode('.', $parsedSourceId['path']);
@@ -199,7 +201,7 @@ class ImportCommand extends ContainerAwareCommand
             return array(
                 'service' => $service,
                 'method' => $method,
-                'arguments' => $parsedSourceId['query']
+                'arguments' => isset($parsedSourceId['query'])?$parsedSourceId['query']:null
             );
         }
 
