@@ -83,8 +83,7 @@ EOT
             $fieldDefinitions = array_change_key_case(array_fill_keys($storage->getFields(), array('type'=>$defaultFieldFormat)), CASE_LOWER);
         }
 
-        /** @var ValueObjectGenerator $voGenerator */
-        $voGenerator = $this->getContainer()->get('mathielen_importengine.generator.valueobject');
+        $voGenerator = new ValueObjectGenerator();
         $voGenerator->setSkeletonDirs(__DIR__.'/../Resources/skeleton');
 
         $filePath = $voGenerator->generate($fieldDefinitions, $clsName, $path);

@@ -27,7 +27,8 @@
   },
   "suggest": {
     "symfony/console": "If you want to use the ImportCommand",
-    "logicx/glueframework": "If you want to use the ImportCommand"
+    "logicx/glueframework": "If you want to use the ImportCommand",
+    "sensio/generator-bundle": "If you want to use the GenerateImportValueObjectCommand"
   },
   "autoload": {
     "psr-0": {
