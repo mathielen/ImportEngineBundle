@@ -2,7 +2,6 @@
 namespace Mathielen\ImportEngineBundle\Command;
 
 use Ddeboer\DataImport\Filter\OffsetFilter;
-use Infrastructure\Utils;
 use Mathielen\DataImport\Event\ImportItemEvent;
 use Mathielen\ImportEngine\Event\ImportConfigureEvent;
 use Mathielen\ImportEngine\Exception\InvalidConfigurationException;
@@ -81,7 +80,7 @@ class ImportCommand extends ContainerAwareCommand
         /** @var ImportBuilder $importBuilder */
         $importBuilder = $this->getContainer()->get('mathielen_importengine.import.builder');
 
-        $importRequest = new ImportRequest($sourceId, $sourceProviderId, $importerId, Utils::whoAmI().'@CLI');
+        $importRequest = new ImportRequest($sourceId, $sourceProviderId, $importerId, self::whoAmI().'@CLI');
 
         $import = $importBuilder->build($importRequest);
 
@@ -206,6 +205,37 @@ class ImportCommand extends ContainerAwareCommand
         }
 
         return $sourceId;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isWindows()
+    {
+        return (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isCli()
+    {
+        return php_sapi_name() == "cli";
+    }
+
+    /**
+     * @return string
+     */
+    public static function whoAmI()
+    {
+        if (self::isWindows()) {
+            $user = getenv("username");
+        } else {
+            $processUser = posix_getpwuid(posix_geteuid());
+            $user = $processUser['name'];
+        }
+
+        return $user;
     }
 
 }
