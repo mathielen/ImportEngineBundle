@@ -36,7 +36,7 @@ class FieldFormatGuess
             $this->hasBlankValues = true;
         } else {
             $type = $this->guessValueType($value);
-            isset($this->typeDistribution[$type]) ? $this->typeDistribution[$type]++ : $this->typeDistribution[$type] = 1;
+            isset($this->typeDistribution[$type]) ? ++$this->typeDistribution[$type] : $this->typeDistribution[$type] = 1;
         }
     }
 

@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Validator\ConstraintViolation;
 
 class ImportCommand extends ContainerAwareCommand
 {
@@ -32,7 +33,7 @@ class ImportCommand extends ContainerAwareCommand
             ->addOption('importer', 'i', InputOption::VALUE_OPTIONAL, 'id/name of importer')
             ->addOption('context', 'c', InputOption::VALUE_OPTIONAL, 'Supply optional context information to import. Supply key-value data in query style: key=value&otherkey=othervalue&...')
             ->addOption('limit', 'l', InputOption::VALUE_OPTIONAL, 'Limit imported rows')
-            ->addOption('dryrun', null, InputOption::VALUE_NONE, 'Do not import - Validation only')
+            ->addOption('dryrun', 'd', InputOption::VALUE_NONE, 'Do not import - Validation only')
         ;
     }
 
@@ -93,7 +94,7 @@ class ImportCommand extends ContainerAwareCommand
             /** @var ImportRun $importRun */
             $importRun = $event->getContext();
             $stats = $importRun->getStatistics();
-            $processed = array_key_exists('processed', $stats)?$stats['processed']:0;
+            $processed = isset($stats['processed'])?$stats['processed']:0;
             $max = $importRun->getInfo()['count'];
 
             if ($progress->getMaxSteps() != $max) {
@@ -131,43 +132,40 @@ class ImportCommand extends ContainerAwareCommand
 
     protected function writeValidationViolations(array $violations, Table $table)
     {
+        $violations = $violations['source'] + $violations['target'];
+
         $table
-            ->setHeaders(array('Type', 'Line', 'Violation'))
+            ->setHeaders(array('Constraint', 'Occurrences (lines)'))
         ;
 
-        $count = 0;
-        $count += $this->writeValidationViolationsType('source', $violations, $table);
-        $count += $this->writeValidationViolationsType('target', $violations, $table);
-
-        if ($count > 0) {
-            $table->render();
-        }
-    }
-
-    /**
-     * @return int number of written violation messages
-     */
-    private function writeValidationViolationsType($type, array $violations, Table $table)
-    {
-        if (!array_key_exists($type, $violations)) {
-            return 0;
-        }
-
-        $i = 0;
-        foreach ($violations[$type] as $line=>$validations) {
+        $tree = [];
+        foreach ($violations as $line=>$validations) {
+            /** @var ConstraintViolation $validation */
             foreach ($validations as $validation) {
-                $table->addRow(array($type, $line, $validation));
-                $i++;
-                if ($i == self::MAX_VIOLATION_ERRORS) {
-                    $table->addRow(new TableSeparator());
-                    $table->addRow(array(null, null, 'There are more errors...'));
-
-                    return $i;
+                $key = $validation->__toString();
+                if (!isset($tree[$key])) {
+                    $tree[$key] = [];
                 }
+                $tree[$key][] = $line;
             }
         }
 
-        return $i;
+        $i = 0;
+        foreach ($tree as $violation=>$lines) {
+            $table->addRow([$violation, join(', ', self::numbersToRangeText($lines))]);
+            ++$i;
+
+            if ($i === self::MAX_VIOLATION_ERRORS) {
+                $table->addRow(new TableSeparator());
+                $table->addRow(array(null, null, 'There are more errors...'));
+
+                return $i;
+            }
+        }
+
+        if (count($violations) > 0) {
+            $table->render();
+        }
     }
 
     protected function writeStatistics(array $statistics, Table $table)
@@ -236,6 +234,45 @@ class ImportCommand extends ContainerAwareCommand
         }
 
         return $user;
+    }
+
+    public static function numbersToRangeText(array $numbers)
+    {
+        if (empty($numbers)) {
+            return [];
+        }
+
+        $ranges = [];
+        sort($numbers);
+
+        $currentRange = [];
+        foreach ($numbers as $number) {
+            if (empty($currentRange) || current($currentRange) === $number-1) {
+                $currentRange[] = $number;
+                end($currentRange);
+            } else {
+                $lastItem = current($currentRange);
+
+                if (count($currentRange) === 1) {
+                    $ranges[] = $lastItem;
+                } else {
+                    $firstItem = reset($currentRange);
+                    $ranges[] = $firstItem . '-' . $lastItem;
+                }
+
+                $currentRange = [];
+            }
+        }
+
+        $lastItem = current($currentRange);
+        if (count($currentRange) === 1) {
+            $ranges[] = $lastItem;
+        } else {
+            $firstItem = reset($currentRange);
+            $ranges[] = $firstItem . '-' . $lastItem;
+        }
+
+        return $ranges;
     }
 
 }
