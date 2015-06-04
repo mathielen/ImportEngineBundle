@@ -93,7 +93,7 @@ class ImportCommand extends ContainerAwareCommand
         //status callback
         $this->getContainer()->get('event_dispatcher')->addListener(ImportItemEvent::AFTER_READ, function (ImportItemEvent $event) use ($output, &$progress) {
             /** @var ImportRun $importRun */
-            $importRun = $event->getContext();
+            $importRun = $event->getContext()->getRun();
             $stats = $importRun->getStatistics();
             $processed = isset($stats['processed'])?$stats['processed']:0;
             $max = $importRun->getInfo()['count'];
