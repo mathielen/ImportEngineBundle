@@ -20,7 +20,7 @@ This library is available on [Packagist](https://packagist.org/packages/mathiele
 To install it, run: 
 
 ```bash
-$ composer require mathielen/import-engine-bundle:dev-master
+$ composer require mathielen/import-engine-bundle
 ```
 
 Then add the bundle to `app/AppKernel.php`:
