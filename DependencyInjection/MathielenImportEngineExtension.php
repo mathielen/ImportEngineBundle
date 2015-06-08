@@ -34,12 +34,12 @@ class MathielenImportEngineExtension extends Extension
         $importerRepositoryDef = $container->findDefinition('mathielen_importengine.importer.repository');
         foreach ($config['importers'] as $name => $importConfig) {
             $finderDef = null;
-            if (array_key_exists('preconditions', $importConfig)) {
+            if (isset($importConfig['preconditions'])) {
                 $finderDef = $this->generateFinderDef($importConfig['preconditions']);
             }
 
             $objectFactoryDef = null;
-            if (array_key_exists('object_factory', $importConfig)) {
+            if (isset($importConfig['object_factory'])) {
                 $objectFactoryDef = $this->generateObjectFactoryDef($importConfig['object_factory']);
             }
 
@@ -69,29 +69,29 @@ class MathielenImportEngineExtension extends Extension
     {
         $finderDef = new Definition('Mathielen\ImportEngine\Importer\ImporterPrecondition');
 
-        if (array_key_exists('filename', $finderConfig)) {
+        if (isset($finderConfig['filename'])) {
             foreach ($finderConfig['filename'] as $conf) {
                 $finderDef->addMethodCall('filename', array($conf));
             }
         }
 
-        if (array_key_exists('format', $finderConfig)) {
+        if (isset($finderConfig['format'])) {
             foreach ($finderConfig['format'] as $conf) {
                 $finderDef->addMethodCall('format', array($conf));
             }
         }
 
-        if (array_key_exists('fieldcount', $finderConfig)) {
+        if (isset($finderConfig['fieldcount'])) {
             $finderDef->addMethodCall('fieldcount', array($finderConfig['fieldcount']));
         }
 
-        if (array_key_exists('fields', $finderConfig)) {
+        if (isset($finderConfig['fields'])) {
             foreach ($finderConfig['fields'] as $conf) {
                 $finderDef->addMethodCall('field', array($conf));
             }
         }
 
-        if (array_key_exists('fieldset', $finderConfig)) {
+        if (isset($finderConfig['fieldset'])) {
             $finderDef->addMethodCall('fieldset', array($finderConfig['fieldset']));
         }
 
@@ -107,12 +107,12 @@ class MathielenImportEngineExtension extends Extension
             $this->getStorageDef($importConfig['target'], $objectFactoryDef)
         ));
 
-        if (array_key_exists('source', $importConfig)) {
+        if (isset($importConfig['source'])) {
             $this->setSourceStorageDef($importConfig['source'], $importerDef);
         }
 
         //enable validation?
-        if (array_key_exists('validation', $importConfig)) {
+        if (isset($importConfig['validation'])) {
             $this->generateValidationDef($importConfig['validation'], $importerDef, $objectFactoryDef);
         }
 
@@ -191,10 +191,10 @@ class MathielenImportEngineExtension extends Extension
         ));
 
         $validatorFilterDef = $this->generateValidatorDef(
-            array_key_exists('options', $validationConfig)?$validationConfig['options']:array()
+            isset($validationConfig['options'])?$validationConfig['options']:array()
         );
 
-        if (array_key_exists('source', $validationConfig)) {
+        if (isset($validationConfig['source'])) {
             $validationDef->addMethodCall('setSourceValidatorFilter', array(
                 $validatorFilterDef
             ));
@@ -208,7 +208,7 @@ class MathielenImportEngineExtension extends Extension
         }
 
         //automatically apply class validation
-        if (array_key_exists('target', $validationConfig)) {
+        if (isset($validationConfig['target'])) {
 
             //using objects as result
             if ($objectFactoryDef) {
