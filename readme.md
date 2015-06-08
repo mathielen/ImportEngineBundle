@@ -150,37 +150,37 @@ $ app/console importengine:generate:valueobject data/myfile.csv Acme\\ValueObjec
 ### Use the importer within a controller / service
 
 ```php
-use Mathielen\ImportEngine\ValueObject\ImportConfiguration;
-use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+namespace AppBundle\Controller;
 
-class DemoController extends Controller
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+class DefaultController extends Controller
 {
 
     /**
-     * @Route("/import", name="_demo_import")
-     * @Template()
+     * Import a given file, that was POST'ed to the HTTP-Endpoint /app/import
+     * * Using the default sorage provider
+     * * The importer is auto-discovered with the format of the file
+     *
+     * @Route("/app/import", name="homepage")
+     * @Method("POST")
      */
-    public function importAction(Request $request)
+    public function importAction(\Symfony\Component\HttpFoundation\Request $request)
     {
-        //handle the uploaded file
-        $storageLocator = $this->container->get('mathielen_importengine.import.storagelocator');
-        $storageSelection = $storageLocator->selectStorage('default', $request->files->getIterator()->current());
+        //create the request for the import-engine
+        $importRequest = new \Mathielen\ImportEngine\ValueObject\ImportRequest($request->files->getIterator()->current());
 
-        //create a new import configuration with your file for the specified importer
-        //you can also use auto-discovery with preconditions (see config above and omit 2nd parameter here)
-        $importConfiguration = new ImportConfiguration($storageSelection, 'your_importer_name');
-
-        //build the import engine
+        /** @var \Mathielen\ImportEngine\Import\ImportBuilder $importBuilder */
         $importBuilder = $this->container->get('mathielen_importengine.import.builder');
-        $importBuilder->build($importConfiguration);
+        $import = $importBuilder->build($importRequest);
 
-        //run the import
+        /** @var \Mathielen\ImportEngine\Import\Run\ImportRunner $importRunner */
         $importRunner = $this->container->get('mathielen_importengine.import.runner');
-        $importRun = $importRunner->run($importConfiguration->toRun());
+        $importRun = $importRunner->run($import);
 
-        return $importRun->getStatistics();
+        return $this->render('default/import.html.twig', $importRun->getStatistics());
     }
 
 }
