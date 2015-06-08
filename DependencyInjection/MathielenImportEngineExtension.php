@@ -265,7 +265,7 @@ class MathielenImportEngineExtension extends Extension
             case 'doctrine':
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\DoctrineQueryStorageProvider', array(
                     new Reference('doctrine.orm.entity_manager'),
-                    array($config['queries'])
+                    $config['queries']
                 ));
                 break;
             case 'service':
