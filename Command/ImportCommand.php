@@ -4,6 +4,7 @@ namespace Mathielen\ImportEngineBundle\Command;
 use Ddeboer\DataImport\Filter\OffsetFilter;
 use Mathielen\DataImport\Event\ImportItemEvent;
 use Mathielen\ImportEngine\Event\ImportConfigureEvent;
+use Mathielen\ImportEngine\Event\ImportRequestEvent;
 use Mathielen\ImportEngine\Exception\InvalidConfigurationException;
 use Mathielen\ImportEngine\Import\ImportBuilder;
 use Mathielen\ImportEngine\Import\Run\ImportRunner;
@@ -74,8 +75,16 @@ class ImportCommand extends ContainerAwareCommand
 
         //set limit
         if ($limit) {
-            $this->getContainer()->get('event_dispatcher')->addListener(ImportConfigureEvent::AFTER_BUILD . '.' . $importerId, function (ImportConfigureEvent $event) use ($limit) {
+            $this->getContainer()->get('event_dispatcher')->addListener(ImportConfigureEvent::AFTER_BUILD, function (ImportConfigureEvent $event) use ($limit) {
                 $event->getImport()->importer()->filters()->add(new OffsetFilter(0, $limit));
+            });
+        }
+
+        //show discovered importer id
+        if (empty($importerId)) {
+            $this->getContainer()->get('event_dispatcher')->addListener(ImportRequestEvent::DISCOVERED, function (ImportRequestEvent $event) use ($output) {
+                $importerId = $event->getImportRequest()->getImporterId();
+                $output->writeln("Importer discovered: <info>$importerId</info>");
             });
         }
 
