@@ -96,6 +96,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
 
                                 ->arrayNode('mappings')
+                                    ->normalizeKeys(false) //do not change - to _ with field names
                                     ->useAttributeAsKey('from')
                                     ->prototype('array')
                                         ->beforeNormalization()

@@ -58,7 +58,10 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
             ->expects($this->exactly(2))
             ->method('addListener')
             ->withConsecutive(
-                array(ImportConfigureEvent::AFTER_BUILD . '.abc', $this->anything())
+                array(
+                    ImportConfigureEvent::AFTER_BUILD,
+                    $this->anything()
+                )
             );
 
         $this->container->get('mathielen_importengine.import.runner')

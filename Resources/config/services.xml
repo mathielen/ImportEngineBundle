@@ -18,6 +18,7 @@
         <service id="mathielen_importengine.converter.contextmerge" class="Mathielen\DataImport\ItemConverter\ContextMergeConverter">
             <tag name="kernel.event_subscriber" />
         </service>
+        <service id="mathielen_importengine.converter.fieldlowercase" class="Mathielen\DataImport\ItemConverter\FieldLowercaseConverter" />
 
 		<service id="mathielen_importengine.importer.format_discoverer" class="Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy" />
 

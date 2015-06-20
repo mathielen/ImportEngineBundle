@@ -117,7 +117,7 @@ class MathielenImportEngineExtension extends Extension
         }
 
         //add converters?
-        if (array_key_exists('mappings', $importConfig)) {
+        if (isset($importConfig['mappings'])) {
             $this->generateTransformerDef($importConfig['mappings'], $importerDef);
         }
 
@@ -131,11 +131,11 @@ class MathielenImportEngineExtension extends Extension
         //set converters
         foreach ($mappingOptions as $field=>$fieldMapping) {
             $converter = null;
-            if (array_key_exists('converter', $fieldMapping)) {
+            if (isset($fieldMapping['converter'])) {
                 $converter = $fieldMapping['converter'];
             }
 
-            if (array_key_exists('to', $fieldMapping)) {
+            if (isset($fieldMapping['to'])) {
                 $mappingsDef->addMethodCall('add', array(
                     $field,
                     $fieldMapping['to'],
