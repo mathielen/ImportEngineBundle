@@ -247,6 +247,11 @@ class MathielenImportEngineExtension extends Extension
 
     private function addStorageProviderDef(Definition $storageLocatorDef, $config, $id = 'default')
     {
+        $formatDiscoverLocalFileStorageFactoryDef = new Definition('Mathielen\ImportEngine\Storage\Factory\FormatDiscoverLocalFileStorageFactory', array(
+            new Definition('Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy'),
+            new Reference('logger')
+        ));
+
         switch ($config['type']) {
             case 'directory':
                 $spFinderDef = new Definition('Symfony\Component\Finder\Finder');
@@ -254,12 +259,14 @@ class MathielenImportEngineExtension extends Extension
                     $config['uri']
                 ));
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\FinderFileStorageProvider', array(
-                    $spFinderDef
+                    $spFinderDef,
+                    $formatDiscoverLocalFileStorageFactoryDef
                 ));
                 break;
             case 'upload':
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\UploadFileStorageProvider', array(
-                    $config['uri']
+                    $config['uri'],
+                    $formatDiscoverLocalFileStorageFactoryDef
                 ));
                 break;
             case 'doctrine':
@@ -275,7 +282,9 @@ class MathielenImportEngineExtension extends Extension
                 ));
                 break;
             case 'file':
-                $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\FileStorageProvider');
+                $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\FileStorageProvider', array(
+                    $formatDiscoverLocalFileStorageFactoryDef
+                ));
                 break;
             default:
                 throw new InvalidConfigurationException('Unknown type for storage provider: '.$config['type']);
