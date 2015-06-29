@@ -123,6 +123,12 @@ mathielen_import_engine:
                 type: file
                 uri: /tmp/myfile.csv
                 format: csv
+                
+        another_minimum_importer:
+            target:
+                type: file
+                uri: /tmp/myfile.csv
+                format: { type: csv, arguments: [','] }    #delimiter is now ','                
 ```
 
 Check out the Testsuite for more information.

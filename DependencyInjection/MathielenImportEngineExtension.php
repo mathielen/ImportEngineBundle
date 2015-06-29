@@ -307,9 +307,10 @@ class MathielenImportEngineExtension extends Extension
                     $config['uri']
                 ));
 
+                $format = $config['format'];
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\LocalFileStorage', array(
                     $fileDef,
-                    new Definition('Mathielen\ImportEngine\Storage\Format\\'.ucfirst($config['format'])."Format")
+                    new Definition('Mathielen\ImportEngine\Storage\Format\\'.ucfirst($format['type'])."Format", $format['arguments'])
                 ));
 
                 break;

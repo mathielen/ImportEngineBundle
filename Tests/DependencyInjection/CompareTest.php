@@ -42,7 +42,3 @@ class CompareTest extends AbstractTest
     }
 
 }
-
-class MyDummyService
-{
-}

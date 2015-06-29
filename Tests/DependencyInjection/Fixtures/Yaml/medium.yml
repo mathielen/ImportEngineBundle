@@ -11,4 +11,4 @@ mathielen_import_engine:
             target:
                 type: file
                 uri: /tmp/myfile.csv
-                format: csv
+                format: { type: csv, arguments: ['a', 'b', 'c', false] }

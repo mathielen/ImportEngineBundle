@@ -34,3 +34,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 class MyImportService
 {
 }
+
+class MyDummyService
+{
+}

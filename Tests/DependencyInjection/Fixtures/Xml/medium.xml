@@ -17,7 +17,15 @@
                         <mathielen_import_engine:constraint field="header2">notempty</mathielen_import_engine:constraint>
                     </mathielen_import_engine:target>
                 </mathielen_import_engine:validation>
-                <mathielen_import_engine:target type="file" uri="/tmp/myfile.csv" format="csv" />
+                <mathielen_import_engine:target type="file" uri="/tmp/myfile.csv">
+                    <mathielen_import_engine:format>
+                        <mathielen_import_engine:type>csv</mathielen_import_engine:type>
+                        <mathielen_import_engine:argument>a</mathielen_import_engine:argument>
+                        <mathielen_import_engine:argument>b</mathielen_import_engine:argument>
+                        <mathielen_import_engine:argument>c</mathielen_import_engine:argument>
+                        <mathielen_import_engine:argument>false</mathielen_import_engine:argument>
+                    </mathielen_import_engine:format>
+                </mathielen_import_engine:target>
             </mathielen_import_engine:importer>
 
         </mathielen_import_engine:config>
