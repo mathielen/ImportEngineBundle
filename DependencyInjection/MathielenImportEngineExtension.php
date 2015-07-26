@@ -248,7 +248,12 @@ class MathielenImportEngineExtension extends Extension
     private function addStorageProviderDef(Definition $storageLocatorDef, $config, $id = 'default')
     {
         $formatDiscoverLocalFileStorageFactoryDef = new Definition('Mathielen\ImportEngine\Storage\Factory\FormatDiscoverLocalFileStorageFactory', array(
-            new Definition('Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy'),
+            new Definition('Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy', array(
+                array(
+                    'text/plain'=>new Definition('Mathielen\ImportEngine\Storage\Format\Factory\CsvAutoDelimiterFormatFactory'),
+                    'text/csv'=>new Definition('Mathielen\ImportEngine\Storage\Format\Factory\CsvAutoDelimiterFormatFactory'),
+                )
+            )),
             new Reference('logger')
         ));
 
