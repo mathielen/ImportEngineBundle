@@ -305,16 +305,12 @@ class MathielenImportEngineExtension extends Extension
     private function getStorageFileDefinitionFromUri($uri)
     {
         if (substr($uri, 0, 2) === '@=') {
-            $fileDef = new Definition('SplFileInfo', array(
-                new Expression(substr($uri, 2))
-            ));
-        } else {
-            $fileDef = new Definition('SplFileInfo', array(
-                $uri
-            ));
+            $uri = new Expression(substr($uri, 2));
         }
 
-        return $fileDef;
+        return new Definition('SplFileInfo', array(
+            $uri
+        ));
     }
 
     /**
