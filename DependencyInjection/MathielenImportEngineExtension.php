@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class MathielenImportEngineExtension extends Extension
 {
@@ -301,6 +302,21 @@ class MathielenImportEngineExtension extends Extension
         ));
     }
 
+    private function getStorageFileDefinitionFromUri($uri)
+    {
+        if (substr($uri, 0, 2) === '@=') {
+            $fileDef = new Definition('SplFileInfo', array(
+                new Expression(substr($uri, 2))
+            ));
+        } else {
+            $fileDef = new Definition('SplFileInfo', array(
+                $uri
+            ));
+        }
+
+        return $fileDef;
+    }
+
     /**
      * @return Definition
      */
@@ -308,9 +324,7 @@ class MathielenImportEngineExtension extends Extension
     {
         switch ($config['type']) {
             case 'file':
-                $fileDef = new Definition('SplFileInfo', array(
-                    $config['uri']
-                ));
+                $fileDef = $this->getStorageFileDefinitionFromUri($config['uri']);
 
                 $format = $config['format'];
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\LocalFileStorage', array(

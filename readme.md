@@ -127,8 +127,10 @@ mathielen_import_engine:
         another_minimum_importer:
             target:
                 type: file
-                uri: /tmp/myfile.csv
-                format: { type: csv, arguments: [','] }    #delimiter is now ','                
+                uri: "@='%kernel.root_dir%/../output_'~date('Y-m-d')~'.csv'"    #this uses symfony expression language
+                                                                                #to create the filename. Just prefix your
+                                                                                #expression with @=
+                format: { type: csv, arguments: [','] }                         #delimiter is now ','                
 ```
 
 Check out the Testsuite for more information.
