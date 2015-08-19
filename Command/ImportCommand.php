@@ -170,13 +170,13 @@ class ImportCommand extends ContainerAwareCommand
 
             if ($i === self::MAX_VIOLATION_ERRORS) {
                 $table->addRow(new TableSeparator());
-                $table->addRow(array(null, null, 'There are more errors...'));
+                $table->addRow(array(null, 'There are more errors...'));
 
-                return $i;
+                break;
             }
         }
 
-        if (count($violations) > 0) {
+        if ($i > 0) {
             $table->render();
         }
     }
