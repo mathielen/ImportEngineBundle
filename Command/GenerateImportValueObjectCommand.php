@@ -84,7 +84,7 @@ EOT
         }
 
         $voGenerator = new ValueObjectGenerator();
-        $voGenerator->setSkeletonDirs($this->getContainer('kernel')->locateResource('@MathielenImportEngineBundle/Resources/skeleton'));
+        $voGenerator->setSkeletonDirs($this->getContainer()->get('kernel')->locateResource('@MathielenImportEngineBundle/Resources/skeleton'));
 
         $filePath = $voGenerator->generate($fieldDefinitions, $clsName, $path);
 

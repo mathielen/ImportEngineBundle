@@ -1,7 +1,7 @@
 <?php
 namespace {{ namespace }};
 
-use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation AS Ser;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class {{ class }}
@@ -9,9 +9,12 @@ class {{ class }}
 
 {% for field_name, field_definition in field_definitions %}
     /**
-     * @Type("{{ field_definition['type'] }}")
+     * @Ser\Type("{{ field_definition['type'] }}")
 {% if field_definition['empty'] == false %}
      * @Assert\NotBlank
+{% endif %}
+{% if field_definition['serialized_name'] is defined %}
+     * @Ser\SerializedName("{{ field_definition['serialized_name'] }}")
 {% endif %}
      */
     private ${{ field_name }};
