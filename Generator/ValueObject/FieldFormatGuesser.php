@@ -27,7 +27,8 @@ class FieldFormatGuesser
         return $fieldDefinitions;
     }
 
-    private static function strtocamelcase($str){
+    private static function strtocamelcase($str)
+    {
         $str = iconv("utf-8","ascii//TRANSLIT", $str);
 
         return preg_replace_callback('#[^\w]+(.)#',
