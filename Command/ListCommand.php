@@ -2,6 +2,7 @@
 namespace Mathielen\ImportEngineBundle\Command;
 
 use Mathielen\ImportEngine\Importer\ImporterRepository;
+use Mathielen\ImportEngine\Validation\DummyValidation;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,13 +21,19 @@ class ListCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $table = new Table($output);
-        $table->setHeaders(['id', 'auto-detectable']);
+        $table->setHeaders(['id', 'auto-detectable', 'validation']);
 
         /** @var ImporterRepository $importRepository */
         $importRepository = $this->getContainer()->get('mathielen_importengine.importer.repository');
 
         foreach ($importRepository->getIds() as $importerId) {
-            $table->addRow([$importerId, $importRepository->hasPrecondition($importerId)?'Yes':'No']);
+            $importer = $importRepository->get($importerId);
+
+            $table->addRow([
+                $importerId,
+                $importRepository->hasPrecondition($importerId)?'Yes':'No',
+                ($importer->validation() instanceof DummyValidation)?'No':'Yes'
+            ]);
         }
 
         $table->render();
