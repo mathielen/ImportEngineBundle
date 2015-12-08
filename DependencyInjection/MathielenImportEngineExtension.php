@@ -54,6 +54,10 @@ class MathielenImportEngineExtension extends Extension
 
     private function generateObjectFactoryDef(array $config)
     {
+        if (!class_exists($config['class'])) {
+            throw new InvalidConfigurationException("Object-Factory target-class '".$config['class']."' does not exist.");
+        }
+
         if ($config['type'] == 'jms_serializer') {
             return new Definition('Mathielen\DataImport\Writer\ObjectWriter\JmsSerializerObjectFactory', array(
                 $config['class'],
