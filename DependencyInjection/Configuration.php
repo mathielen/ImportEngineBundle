@@ -55,6 +55,10 @@ class Configuration implements ConfigurationInterface
                         ->prototype('array')
                             ->fixXmlConfig('mapping') //allows <mapping> instead of <mappings>
                             ->children()
+                                ->arrayNode('context')
+                                    ->prototype('scalar')->end()
+                                ->end()
+
                                 ->arrayNode('preconditions')
                                     ->fixXmlConfig('field')  //allows <field> instead of <fields>
                                     ->children()
@@ -93,6 +97,10 @@ class Configuration implements ConfigurationInterface
                                         ->scalarNode('class')
                                         ->end()
                                     ->end()
+                                ->end()
+
+                                ->arrayNode('filters')
+                                    ->prototype('scalar')->end()
                                 ->end()
 
                                 ->arrayNode('mappings')

@@ -113,16 +113,43 @@ class MathielenImportEngineExtension extends Extension
         }
 
         //enable validation?
-        if (isset($importConfig['validation'])) {
+        if (isset($importConfig['validation']) && !empty($importConfig['validation'])) {
             $this->generateValidationDef($importConfig['validation'], $importerDef, $objectFactoryDef);
         }
 
         //add converters?
-        if (isset($importConfig['mappings'])) {
+        if (isset($importConfig['mappings']) && !empty($importConfig['mappings'])) {
             $this->generateTransformerDef($importConfig['mappings'], $importerDef);
         }
 
+        //add filters?
+        if (isset($importConfig['filters']) && !empty($importConfig['filters'])) {
+            $this->generateFiltersDef($importConfig['filters'], $importerDef);
+        }
+
+        //has static context?
+        if (isset($importConfig['context'])) {
+            $importerDef->addMethodCall('setContext', array(
+                $importConfig['context']
+            ));
+        }
+
         return $importerDef;
+    }
+
+    private function generateFiltersDef(array $filtersOptions, Definition $importerDef)
+    {
+        $filtersDef = new Definition('Mathielen\ImportEngine\Filter\Filters');
+
+        foreach ($filtersOptions as $filtersOption) {
+            $filtersDef->addMethodCall('add', array(
+                new Reference($filtersOption)
+            ));
+        }
+
+        $importerDef->addMethodCall('filters', array(
+            $filtersDef
+        ));
     }
 
     private function generateTransformerDef(array $mappingOptions, Definition $importerDef)
