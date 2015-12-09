@@ -21,14 +21,14 @@ class Configuration implements ConfigurationInterface
                     ->arrayNode('storageprovider')
                         ->useAttributeAsKey('name')
                         ->prototype('array')
-                            ->fixXmlConfig('service') //allows <service> instead of <services>
                             ->fixXmlConfig('query', 'queries') //allows <query> instead of <queries>
                             ->children()
                                 ->enumNode('type')
                                     ->values($providerTypes)
                                 ->end()
                                 ->scalarNode('uri')->end()      //file
-                                ->arrayNode('services')
+                                ->scalarNode('service')->end()  //service
+                                /*->arrayNode('service')        TODO whitelist methods
                                     ->useAttributeAsKey('name')
                                     ->prototype('array')
                                         ->fixXmlConfig('method') //allows <method> instead of <methods>
@@ -42,7 +42,7 @@ class Configuration implements ConfigurationInterface
                                             ->end()
                                         ->end()
                                     ->end()
-                                ->end()
+                                ->end()*/
                                 ->arrayNode('queries')
                                     ->prototype('scalar')->end()
                                 ->end()
