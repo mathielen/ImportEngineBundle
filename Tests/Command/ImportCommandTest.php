@@ -43,7 +43,7 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
     {
         $this->container->get('mathielen_importengine.import.builder')
             ->expects($this->once())
-            ->method('build')
+            ->method('buildFromRequest')
             ->will($this->returnValue(
                 new Import(
                     new Importer(
@@ -68,7 +68,7 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('run');
 
-        $input = new ArrayInput(array('--limit'=>1, '--importer'=>'abc', 'source_id'), $this->command->getDefinition());
+        $input = new ArrayInput(array('--limit'=>1, '--importer'=>'abc', 'source_id'=>'source_id'), $this->command->getDefinition());
         $output = new TestOutput();
 
         $this->command->run($input, $output);
@@ -78,7 +78,7 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
     {
         $this->container->get('mathielen_importengine.import.builder')
             ->expects($this->once())
-            ->method('build')
+            ->method('buildFromRequest')
             ->will($this->returnValue(
                 new Import(
                     new Importer(
@@ -93,7 +93,7 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('dryrun');
 
-        $input = new ArrayInput(array('--dryrun'=>true, '--importer'=>'abc', 'source_id'), $this->command->getDefinition());
+        $input = new ArrayInput(array('--dryrun'=>true, '--importer'=>'abc', 'source_id'=>'source_id'), $this->command->getDefinition());
         $output = new TestOutput();
 
         $this->command->run($input, $output);
@@ -106,7 +106,7 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
     {
         $this->container->get('mathielen_importengine.import.builder')
             ->expects($this->once())
-            ->method('build')
+            ->method('buildFromRequest')
             ->with(new ImportRequest($parsedSourceId, 'default', null, Utils::whoAmI().'@CLI'))
             ->will($this->returnValue(
                 new Import(

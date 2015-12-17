@@ -16,7 +16,7 @@
   ],
   "require": {
     "php": ">=5.4.0",
-    "mathielen/import-engine": ">=0.8.3",
+    "mathielen/import-engine": ">=0.8.6",
     "symfony/framework-bundle": "~2.4|3.0.*"
   },
   "require-dev": {
@@ -25,7 +25,7 @@
     "sensio/generator-bundle": "~2.3"
   },
   "suggest": {
-    "symfony/console": "If you want to use the ImportCommand",
+    "symfony/console": "If you want to use the Commands",
     "sensio/generator-bundle": "If you want to use the GenerateImportValueObjectCommand"
   },
   "autoload": {

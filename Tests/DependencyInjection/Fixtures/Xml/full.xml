@@ -43,7 +43,7 @@
                     <mathielen_import_engine:filename>regexp1</mathielen_import_engine:filename>
                     <mathielen_import_engine:filename>regexp2</mathielen_import_engine:filename>
                 </mathielen_import_engine:preconditions>
-                <mathielen_import_engine:object_factory type="jms_serializer" class="Acme\DemoBundle\ValueObject\MyImportedRow" />
+                <mathielen_import_engine:object_factory type="jms_serializer" class="Mathielen\ImportEngineBundle\Tests\MyImportedRow" />
                 <mathielen_import_engine:mapping from="header1" to="targetField1" converter="some.converter.serviceid" />
                 <mathielen_import_engine:mapping from="header2" converter="some.other.converter.serviceid" />
                 <mathielen_import_engine:mapping from="header3" to="targetField3" />
@@ -59,12 +59,12 @@
                     <mathielen_import_engine:format>excel</mathielen_import_engine:format>
                     <mathielen_import_engine:filename>regexp1</mathielen_import_engine:filename>
                 </mathielen_import_engine:preconditions>
-                <mathielen_import_engine:object_factory type="default" class="Acme\DemoBundle\ValueObject\MyImportedRow" />
+                <mathielen_import_engine:object_factory type="default" class="Mathielen\ImportEngineBundle\Tests\MyImportedRow" />
                 <mathielen_import_engine:source type="file" uri="/tmp/import.csv" format="csv" />
                 <mathielen_import_engine:validation>
                     <mathielen_import_engine:target/>
                 </mathielen_import_engine:validation>
-                <mathielen_import_engine:target type="doctrine" entity="Acme\DemoBundle\Entity\MyImportedEntity" />
+                <mathielen_import_engine:target type="doctrine" entity="Mathielen\ImportEngineBundle\Tests\MyImportedRow" />
             </mathielen_import_engine:importer>
 
         </mathielen_import_engine:config>

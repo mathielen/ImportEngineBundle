@@ -33,7 +33,7 @@ mathielen_import_engine:
                 filename: ['regexp1', 'regexp2']
             object_factory:
                 type: jms_serializer
-                class: Acme\DemoBundle\ValueObject\MyImportedRow
+                class: Mathielen\ImportEngineBundle\Tests\MyImportedRow
             mappings:
                 header1:
                     to: targetField1
@@ -56,7 +56,7 @@ mathielen_import_engine:
                 filename: regexp1
             object_factory:
                 type: default
-                class: Acme\DemoBundle\ValueObject\MyImportedRow
+                class: Mathielen\ImportEngineBundle\Tests\MyImportedRow
             source:
                 type: file
                 uri: /tmp/import.csv
@@ -65,4 +65,4 @@ mathielen_import_engine:
                 target: ~
             target:
                 type: doctrine
-                entity: Acme\DemoBundle\Entity\MyImportedEntity
+                entity: Mathielen\ImportEngineBundle\Tests\MyImportedRow

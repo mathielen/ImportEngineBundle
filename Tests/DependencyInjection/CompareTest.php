@@ -42,3 +42,5 @@ class CompareTest extends AbstractTest
     }
 
 }
+
+class MyImportedRow {}

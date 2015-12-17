@@ -93,7 +93,7 @@ class ImportCommand extends ContainerAwareCommand
 
         $importRequest = new ImportRequest($sourceId, $sourceProviderId, $importerId, Utils::whoAmI().'@CLI');
 
-        $import = $importBuilder->build($importRequest);
+        $import = $importBuilder->buildFromRequest($importRequest);
 
         //apply context info from commandline
         $importRun = $import->getRun();
