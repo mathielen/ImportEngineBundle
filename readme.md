@@ -66,6 +66,9 @@ mathielen_import_engine:
     #configure your Importers
     importers:
         your_importer_name:
+            #some context information that is passed through the whole process
+            context:
+                key: value
 
             #automaticly recognize this importer by meeting of the conditions below
             preconditions:

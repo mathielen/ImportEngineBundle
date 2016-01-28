@@ -32,6 +32,14 @@
             </mathielen_import_engine:storageprovider>
 
             <mathielen_import_engine:importer name="maximum_importer">
+                <mathielen_import_engine:context>
+                    <mathielen_import_engine:key1>value1</mathielen_import_engine:key1>
+                    <mathielen_import_engine:key2>
+                        <mathielen_import_engine:deep-key1>value2.1</mathielen_import_engine:deep-key1>
+                        <mathielen_import_engine:deep-key2>value2.2.1</mathielen_import_engine:deep-key2>
+                        <mathielen_import_engine:deep-key2>value2.2.2</mathielen_import_engine:deep-key2>
+                    </mathielen_import_engine:key2>
+                </mathielen_import_engine:context>
                 <mathielen_import_engine:preconditions>
                     <mathielen_import_engine:format>excel</mathielen_import_engine:format>
                     <mathielen_import_engine:format>csv</mathielen_import_engine:format>
@@ -55,6 +63,7 @@
             </mathielen_import_engine:importer>
 
             <mathielen_import_engine:importer name="doctrine_importer">
+                <mathielen_import_engine:context>context</mathielen_import_engine:context>
                 <mathielen_import_engine:preconditions>
                     <mathielen_import_engine:format>excel</mathielen_import_engine:format>
                     <mathielen_import_engine:filename>regexp1</mathielen_import_engine:filename>

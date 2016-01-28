@@ -56,7 +56,11 @@ class Configuration implements ConfigurationInterface
                             ->fixXmlConfig('mapping') //allows <mapping> instead of <mappings>
                             ->children()
                                 ->arrayNode('context')
-                                    ->prototype('scalar')->end()
+                                    ->beforeNormalization()
+                                        ->ifString()
+                                        ->then(function ($v) { return array($v); })
+                                    ->end()
+                                    ->prototype('variable')->end()
                                 ->end()
 
                                 ->arrayNode('preconditions')

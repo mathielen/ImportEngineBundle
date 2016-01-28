@@ -21,6 +21,11 @@ mathielen_import_engine:
                 export_serviceB: ~
     importers:
         maximum_importer:
+            context:
+                key1: value1
+                key2:
+                    deep-key1: value2.1
+                    deep-key2: [value2.2.1, value2.2.2]
             preconditions:
                 format: ['excel', 'csv']
                 fieldcount: 2
@@ -51,6 +56,7 @@ mathielen_import_engine:
                 service: import_service
                 method: processImportRow
         doctrine_importer:
+            context: context
             preconditions:
                 format: excel
                 filename: regexp1
