@@ -32,9 +32,9 @@ class ImportCommand extends ContainerAwareCommand
             ->setDescription('Imports data with a definied importer')
             ->addArgument('source_id', InputArgument::REQUIRED, "id of source. Different StorageProviders need different id data.\n- upload, directory: \"<path/to/file>\"\n- doctrine: \"<id of query>\"\n- service: \"<service>.<method>[?arguments_like_url_query]\"")
             ->addArgument('source_provider', InputArgument::OPTIONAL, 'id of source provider', 'default')
-            ->addOption('importer', 'i', InputOption::VALUE_OPTIONAL, 'id/name of importer')
-            ->addOption('context', 'c', InputOption::VALUE_OPTIONAL, 'Supply optional context information to import. Supply key-value data in query style: key=value&otherkey=othervalue&...')
-            ->addOption('limit', 'l', InputOption::VALUE_OPTIONAL, 'Limit imported rows')
+            ->addOption('importer', 'i', InputOption::VALUE_REQUIRED, 'id/name of importer')
+            ->addOption('context', 'c', InputOption::VALUE_REQUIRED, 'Supply optional context information to import. Supply key-value data in query style: key=value&otherkey=othervalue&...')
+            ->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit imported rows')
             ->addOption('dryrun', 'd', InputOption::VALUE_NONE, 'Do not import - Validation only')
         ;
     }
