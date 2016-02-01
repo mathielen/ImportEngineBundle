@@ -143,7 +143,7 @@ Usage
 
 ### On the command line
 
-#### Show your configures Import profiles
+#### Show your configured Import profiles
 ```bash
 $ app/console importengine:list
 ```
