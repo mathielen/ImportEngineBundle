@@ -97,7 +97,9 @@ class ImportCommand extends ContainerAwareCommand
 
         //apply context info from commandline
         $importRun = $import->getRun();
-        $importRun->setContext($context);
+        if ($context) {
+            $importRun->setContext($context);
+        }
 
         //status callback
         $this->getContainer()->get('event_dispatcher')->addListener(ImportItemEvent::AFTER_READ, function (ImportItemEvent $event) use ($output, &$progress) {
