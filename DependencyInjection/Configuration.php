@@ -10,7 +10,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $storageTypes = array('service', 'array', 'doctrine', 'file');
-        $providerTypes = array('file', 'directory', 'upload', 'doctrine', 'service');
+        $providerTypes = array('file', 'directory', 'upload', 'doctrine', 'service', 'dbal');
         $fileFormats = array('csv', 'excel', 'xml', 'yaml');
 
         $treeBuilder = new TreeBuilder();
@@ -27,7 +27,8 @@ class Configuration implements ConfigurationInterface
                                 ->enumNode('type')
                                     ->values($providerTypes)
                                 ->end()
-                                ->scalarNode('uri')->end()      //file
+                                ->scalarNode('uri')->end()                      //file
+                                ->scalarNode('connection_factory')->end()       //dbal & doctrine
                                 ->arrayNode('services')
                                     ->useAttributeAsKey('name')
                                     ->prototype('array')
@@ -43,7 +44,12 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                 ->end()
-                                ->arrayNode('queries')
+                                ->arrayNode('queries')                          //dbal & doctrine
+                                    ->beforeNormalization()
+                                        ->ifString()
+                                        ->then(function ($v) { return [$v]; })
+                                    ->end()
+                                    ->useAttributeAsKey('name')
                                     ->prototype('scalar')->end()
                                 ->end()
                             ->end()

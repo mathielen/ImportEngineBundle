@@ -53,9 +53,14 @@ mathielen_import_engine:
             uri: /tmp/somedir
         doctrine:
             type: doctrine
-            queries:
-                - SELECT id FROM Acme\DemoBundle\Entity\Person P WHERE P.age > 10
-                - Acme\DemoBundle\Entity\ImportData
+            queries:        #a list of DQL-Statements, Entity-Classnames, filenames or directories
+                - SELECT id FROM Acme\DemoBundle\Entity\Person P WHERE P.age > 10   #dql statement
+                - Acme\DemoBundle\Entity\ImportData     #entity classname
+                - %kernel.root_dir%/dql/mysql.dql       #file with dql statement in it
+                - %kernel.root_dir%/other-dql           #directory
+        dbal:
+            type: dbal
+            queries: %kernel.root_dir%/sql/         #same like doctrine
         services:
             type: service
             services:

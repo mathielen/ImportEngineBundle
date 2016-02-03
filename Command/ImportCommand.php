@@ -75,6 +75,8 @@ class ImportCommand extends ContainerAwareCommand
 
         //set limit
         if ($limit) {
+            $output->writeln("Limiting import to <info>$limit</info> rows.");
+
             $this->getContainer()->get('event_dispatcher')->addListener(ImportConfigureEvent::AFTER_BUILD, function (ImportConfigureEvent $event) use ($limit) {
                 $event->getImport()->importer()->filters()->add(new OffsetFilter(0, $limit));
             });

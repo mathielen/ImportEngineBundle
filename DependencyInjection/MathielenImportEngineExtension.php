@@ -2,6 +2,7 @@
 namespace Mathielen\ImportEngineBundle\DependencyInjection;
 
 use Mathielen\ImportEngine\Exception\InvalidConfigurationException;
+use Mathielen\ImportEngine\Storage\Provider\Connection\DefaultConnectionFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -307,9 +308,16 @@ class MathielenImportEngineExtension extends Extension
                 ));
                 break;
             case 'doctrine':
+                $listResolverDef = new Definition(StringOrFileList::class, array($config['queries']));
+                if (!isset($config['connection_factory'])) {
+                    $connectionFactoryDef = new Definition(DefaultConnectionFactory::class, array(array('default'=>new Reference('doctrine.orm.entity_manager'))));
+                } else {
+                    $connectionFactoryDef = new Reference($config['connection_factory']);
+                }
+
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\DoctrineQueryStorageProvider', array(
-                    new Reference('doctrine.orm.entity_manager'),
-                    $config['queries']
+                    $connectionFactoryDef,
+                    $listResolverDef
                 ));
                 break;
             case 'service':
@@ -321,6 +329,19 @@ class MathielenImportEngineExtension extends Extension
             case 'file':
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\FileStorageProvider', array(
                     $formatDiscoverLocalFileStorageFactoryDef
+                ));
+                break;
+            case 'dbal':
+                $listResolverDef = new Definition(StringOrFileList::class, array($config['queries']));
+                if (!isset($config['connection_factory'])) {
+                    $connectionFactoryDef = new Definition(DefaultConnectionFactory::class, array(array('default'=>new Reference('doctrine.dbal.default_connection'))));
+                } else {
+                    $connectionFactoryDef = new Reference($config['connection_factory']);
+                }
+
+                $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\DbalStorageProvider', array(
+                    $connectionFactoryDef,
+                    $listResolverDef
                 ));
                 break;
             default:
