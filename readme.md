@@ -148,6 +148,11 @@ Usage
 
 ### On the command line
 
+#### Show your configured Import profiles
+```bash
+$ app/console importengine:list
+```
+
 #### Let the framework discover which importer suites best (auto discovery) ####
 ```bash
 $ app/console importengine:import /tmp/somedir/myfile.csv
