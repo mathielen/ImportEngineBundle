@@ -43,6 +43,7 @@
                 </service>
             </argument>
             <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="logger" />
         </service>
 
         <service id="mathielen_importengine.generator.valueobject.fieldformatguesser" class="Mathielen\ImportEngineBundle\Generator\ValueObject\FieldFormatGuesser" />
