@@ -45,12 +45,12 @@ Full example:
 mathielen_import_engine:
     #configure storageproviders, that are used in all importers
     storageprovider:
+        default:
+            type: directory
+            uri: /tmp/somedir
         upload:
             type: upload
             uri: "%kernel.root_dir%/Resources/import"
-        local:
-            type: directory
-            uri: /tmp/somedir
         doctrine:
             type: doctrine
             queries:        #a list of DQL-Statements, Entity-Classnames, filenames or directories
@@ -154,11 +154,13 @@ $ app/console importengine:list
 ```
 
 #### Let the framework discover which importer suites best (auto discovery) ####
+Uses the storageprovider "default" if not also given as argument.
 ```bash
 $ app/console importengine:import /tmp/somedir/myfile.csv
 ```
 
 #### Import myfile.csv with "your_importer_name" importer ####
+Uses the storageprovider "default" if not also given as argument.
 ```bash
 $ app/console importengine:import -i your_importer_name /tmp/somedir/myfile.csv
 ```
