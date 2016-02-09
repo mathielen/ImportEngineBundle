@@ -31,8 +31,11 @@ class StringOrFileList extends \ArrayObject
 
     public function offsetGet($offset)
     {
-        $v = parent::offsetGet($offset);
+        if (!parent::offsetExists($offset)) {
+            throw new \InvalidArgumentException("Item with id '$offset' could not be found.");
+        }
 
+        $v = parent::offsetGet($offset);
         if ($v instanceof \SplFileInfo) {
             return file_get_contents($v);
         }
