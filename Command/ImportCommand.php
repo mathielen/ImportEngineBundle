@@ -93,15 +93,12 @@ class ImportCommand extends ContainerAwareCommand
         /** @var ImportBuilder $importBuilder */
         $importBuilder = $this->getContainer()->get('mathielen_importengine.import.builder');
 
-        $importRequest = new ImportRequest($sourceId, $sourceProviderId, $importerId, Utils::whoAmI().'@CLI');
+        $importRequest = new ImportRequest($sourceId, $sourceProviderId, $importerId, Utils::whoAmI().'@CLI', $context);
 
         $import = $importBuilder->buildFromRequest($importRequest);
 
         //apply context info from commandline
         $importRun = $import->getRun();
-        if ($context) {
-            $importRun->setContext($context);
-        }
 
         //status callback
         $this->getContainer()->get('event_dispatcher')->addListener(ImportItemEvent::AFTER_READ, function (ImportItemEvent $event) use ($output, &$progress) {
