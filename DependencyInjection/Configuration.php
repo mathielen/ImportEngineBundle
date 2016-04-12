@@ -9,7 +9,7 @@ class Configuration implements ConfigurationInterface
 
     public function getConfigTreeBuilder()
     {
-        $storageTypes = array('service', 'array', 'doctrine', 'file');
+        $storageTypes = array('callable', 'service', 'array', 'doctrine', 'file');
         $providerTypes = array('file', 'directory', 'upload', 'doctrine', 'service', 'dbal');
         $fileFormats = array('csv', 'excel', 'xml', 'yaml');
 
@@ -191,6 +191,10 @@ class Configuration implements ConfigurationInterface
 
                                 ->arrayNode('target')
                                     ->isRequired()
+                                    ->beforeNormalization()
+                                        ->always()
+                                        ->then(function ($v) { return !isset($v['type'])?['type'=>'callable', 'callable'=>$v]:$v; })
+                                    ->end()
                                     ->children()
                                         ->enumNode('type')
                                             ->values($storageTypes)
@@ -199,7 +203,7 @@ class Configuration implements ConfigurationInterface
                                             ->fixXmlConfig('argument')
                                             ->beforeNormalization()
                                                 ->ifString()
-                                                ->then(function ($v) { return array('type'=>$v); })
+                                                ->then(function ($v) { return ['type'=>$v]; })
                                             ->end()
                                             ->children()
                                                 ->scalarNode('type')->isRequired()->end()
@@ -209,8 +213,9 @@ class Configuration implements ConfigurationInterface
                                             ->end()
                                         ->end()
                                         ->scalarNode('uri')->end()      //file
-                                        ->scalarNode('service')->end()  //service
-                                        ->scalarNode('method')->end()   //service
+                                        ->variableNode('callable')->end()  //callable
+                                        ->variableNode('service')->end()  //service
+                                        ->variableNode('method')->end()  //service
                                         ->scalarNode('entity')->end()   //doctrine
                                     ->end()
                                 ->end()

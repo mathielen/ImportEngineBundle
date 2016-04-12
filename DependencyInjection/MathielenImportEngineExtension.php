@@ -307,6 +307,19 @@ class MathielenImportEngineExtension extends Extension
                     $formatDiscoverLocalFileStorageFactoryDef
                 ));
                 break;
+            case 'dbal':
+                $listResolverDef = new Definition(StringOrFileList::class, array($config['queries']));
+                if (!isset($config['connection_factory'])) {
+                    $connectionFactoryDef = new Definition(DefaultConnectionFactory::class, array(array('default'=>new Reference('doctrine.dbal.default_connection'))));
+                } else {
+                    $connectionFactoryDef = new Reference($config['connection_factory']);
+                }
+
+                $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\DbalStorageProvider', array(
+                    $connectionFactoryDef,
+                    $listResolverDef
+                ));
+                break;
             case 'doctrine':
                 $listResolverDef = new Definition(StringOrFileList::class, array($config['queries']));
                 if (!isset($config['connection_factory'])) {
@@ -329,19 +342,6 @@ class MathielenImportEngineExtension extends Extension
             case 'file':
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\FileStorageProvider', array(
                     $formatDiscoverLocalFileStorageFactoryDef
-                ));
-                break;
-            case 'dbal':
-                $listResolverDef = new Definition(StringOrFileList::class, array($config['queries']));
-                if (!isset($config['connection_factory'])) {
-                    $connectionFactoryDef = new Definition(DefaultConnectionFactory::class, array(array('default'=>new Reference('doctrine.dbal.default_connection'))));
-                } else {
-                    $connectionFactoryDef = new Reference($config['connection_factory']);
-                }
-
-                $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\DbalStorageProvider', array(
-                    $connectionFactoryDef,
-                    $listResolverDef
                 ));
                 break;
             default:
@@ -388,10 +388,20 @@ class MathielenImportEngineExtension extends Extension
                 ));
 
                 break;
+            //@deprecated
             case 'service':
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\ServiceStorage', array(
-                    array(new Reference($config['service']), $config['method']), //callable
-                    array(),
+                    [new Reference($config['service']), $config['method']], //callable
+                    [],
+                    $objectFactoryDef //from parameter array
+                ));
+
+                break;
+            case 'callable':
+                $config['callable'][0] = new Reference($config['callable'][0]);
+                $storageDef = new Definition('Mathielen\ImportEngine\Storage\ServiceStorage', array(
+                    $config['callable'],
+                    [],
                     $objectFactoryDef //from parameter array
                 ));
 

@@ -118,7 +118,7 @@ mathielen_import_engine:
             #target of import
             target:
                 type: service               #[service, doctrine, file]
-                service: import_service     #service name in DIC
+                service: '@import_service'     #service name in DIC
                 method: processImportRow    #method to invoke on service
 ```
 
