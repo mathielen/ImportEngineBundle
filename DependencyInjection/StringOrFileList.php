@@ -31,6 +31,10 @@ class StringOrFileList extends \ArrayObject
 
     public function offsetGet($offset)
     {
+        //offset could be myfile.sql?targetconnection
+        $url = parse_url($offset);
+        $offset = $url['path'];
+        
         if (!parent::offsetExists($offset)) {
             throw new \InvalidArgumentException("Item with id '$offset' could not be found.");
         }
