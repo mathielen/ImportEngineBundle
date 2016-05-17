@@ -34,6 +34,7 @@ class ImportCommand extends ContainerAwareCommand
             ->addArgument('source_provider', InputArgument::OPTIONAL, 'id of source provider', 'default')
             ->addOption('importer', 'i', InputOption::VALUE_REQUIRED, 'id/name of importer')
             ->addOption('context', 'c', InputOption::VALUE_REQUIRED, 'Supply optional context information to import. Supply key-value data in query style: key=value&otherkey=othervalue&...')
+            ->addOption('offset', 'o', InputOption::VALUE_REQUIRED, 'Offset imported rows', 0)
             ->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit imported rows')
             ->addOption('dryrun', 'd', InputOption::VALUE_NONE, 'Do not import - Validation only')
         ;
@@ -62,11 +63,12 @@ class ImportCommand extends ContainerAwareCommand
             }
         }
         $limit = $input->getOption('limit');
+        $offset = $input->getOption('offset');
 
-        $this->import($output, $importerId, $sourceProviderId, $sourceId, $context, $limit, $isDryrun);
+        $this->import($output, $importerId, $sourceProviderId, $sourceId, $context, $offset, $limit, $isDryrun);
     }
 
-    protected function import(OutputInterface $output, $importerId, $sourceProviderId, $sourceId, $context=null, $limit=null, $isDryrun=false)
+    protected function import(OutputInterface $output, $importerId, $sourceProviderId, $sourceId, $context=null, $offset=0, $limit=null, $isDryrun=false)
     {
         $output->writeln("Commencing ".($isDryrun?'<comment>dry-run</comment> ':'')."import using importer ".(empty($importerId)?'<comment>unknown</comment>':"<info>$importerId</info>")." with source provider <info>$sourceProviderId</info> and source id <info>$sourceId</info>");
 
@@ -77,8 +79,8 @@ class ImportCommand extends ContainerAwareCommand
         if ($limit) {
             $output->writeln("Limiting import to <info>$limit</info> rows.");
 
-            $this->getContainer()->get('event_dispatcher')->addListener(ImportConfigureEvent::AFTER_BUILD, function (ImportConfigureEvent $event) use ($limit) {
-                $event->getImport()->importer()->filters()->add(new OffsetFilter(0, $limit));
+            $this->getContainer()->get('event_dispatcher')->addListener(ImportConfigureEvent::AFTER_BUILD, function (ImportConfigureEvent $event) use ($offset, $limit) {
+                $event->getImport()->importer()->filters()->add(new OffsetFilter($offset, $limit));
             });
         }
 
