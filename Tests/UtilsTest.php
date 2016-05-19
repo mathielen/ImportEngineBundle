@@ -1,11 +1,11 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\Tests;
 
 use Mathielen\ImportEngineBundle\Utils;
 
 class UtilsTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testIsCli()
     {
         $this->assertTrue(Utils::isCli());
@@ -32,10 +32,9 @@ class UtilsTest extends \PHPUnit_Framework_TestCase
         return [
             [[], []],
             [[1], ['1']],
-            [[1,2,3], ['1-3']],
-            [[1,2,4,5], ['1-2', '4-5']],
-            [[1,3,5,7], ['1', '3', '5', '7']]
+            [[1, 2, 3], ['1-3']],
+            [[1, 2, 4, 5], ['1-2', '4-5']],
+            [[1, 3, 5, 7], ['1', '3', '5', '7']],
         ];
     }
-
 }

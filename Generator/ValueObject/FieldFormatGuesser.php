@@ -1,18 +1,18 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\Generator\ValueObject;
 
 class FieldFormatGuesser
 {
-
     /**
      * @var FieldFormatGuess[]
      */
     private $fields = array();
 
-    public function getFieldDefinitionGuess($defaultFieldFormat='string')
+    public function getFieldDefinitionGuess($defaultFieldFormat = 'string')
     {
         $fieldDefinitions = array();
-        foreach ($this->fields as $fieldName=>$fieldGuess) {
+        foreach ($this->fields as $fieldName => $fieldGuess) {
             $fieldDefinition = $fieldGuess->guessFieldType($defaultFieldFormat);
 
             $sanitizedFieldName = self::strtocamelcase($fieldName);
@@ -29,7 +29,7 @@ class FieldFormatGuesser
 
     private static function strtocamelcase($str)
     {
-        $str = iconv("utf-8","ascii//TRANSLIT", $str);
+        $str = iconv('utf-8', 'ascii//TRANSLIT', $str);
 
         return preg_replace_callback('#[^\w]+(.)#',
             create_function('$r', 'return strtoupper($r[1]);'), $str);
@@ -37,7 +37,7 @@ class FieldFormatGuesser
 
     public function putRow(array $row)
     {
-        foreach ($row as $k=>$v) {
+        foreach ($row as $k => $v) {
             $this->addGuess($k, $v);
         }
     }
@@ -60,5 +60,4 @@ class FieldFormatGuesser
         $fieldGuess = $this->getOrCreateFieldGuess($fieldname);
         $fieldGuess->addValue($fieldvalue);
     }
-
 }

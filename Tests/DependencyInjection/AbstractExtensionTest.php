@@ -1,11 +1,11 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 abstract class AbstractExtensionTest extends AbstractTest
 {
-
     abstract protected function loadConfiguration(ContainerBuilder $container, $resource);
 
     private function getContainer($resource = null)
@@ -53,7 +53,7 @@ abstract class AbstractExtensionTest extends AbstractTest
         $container = $this->getContainer('full');
 
         $storageLocatorDef = $container->findDefinition('mathielen_importengine.import.storagelocator');
-        $methodCalls       = $storageLocatorDef->getMethodCalls();
+        $methodCalls = $storageLocatorDef->getMethodCalls();
 
         $registeredStorageProviderIds = [];
         foreach ($methodCalls as $methodCall) {

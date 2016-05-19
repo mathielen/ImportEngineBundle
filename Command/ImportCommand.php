@@ -1,4 +1,5 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\Command;
 
 use Ddeboer\DataImport\Filter\OffsetFilter;
@@ -23,7 +24,6 @@ use Symfony\Component\Validator\ConstraintViolation;
 
 class ImportCommand extends ContainerAwareCommand
 {
-
     const MAX_VIOLATION_ERRORS = 10;
 
     protected function configure()
@@ -43,7 +43,7 @@ class ImportCommand extends ContainerAwareCommand
     {
         if (!$this->getContainer()->has('mathielen_importengine.import.builder') ||
             !$this->getContainer()->has('mathielen_importengine.import.runner')) {
-            throw new InvalidConfigurationException("No importengine services have been found. Did you register the bundle in AppKernel and configured at least one importer in config?");
+            throw new InvalidConfigurationException('No importengine services have been found. Did you register the bundle in AppKernel and configured at least one importer in config?');
         }
     }
 
@@ -66,9 +66,9 @@ class ImportCommand extends ContainerAwareCommand
         $this->import($output, $importerId, $sourceProviderId, $sourceId, $context, $limit, $isDryrun);
     }
 
-    protected function import(OutputInterface $output, $importerId, $sourceProviderId, $sourceId, $context=null, $limit=null, $isDryrun=false)
+    protected function import(OutputInterface $output, $importerId, $sourceProviderId, $sourceId, $context = null, $limit = null, $isDryrun = false)
     {
-        $output->writeln("Commencing ".($isDryrun?'<comment>dry-run</comment> ':'')."import using importer ".(empty($importerId)?'<comment>unknown</comment>':"<info>$importerId</info>")." with source provider <info>$sourceProviderId</info> and source id <info>$sourceId</info>");
+        $output->writeln('Commencing '.($isDryrun ? '<comment>dry-run</comment> ' : '').'import using importer '.(empty($importerId) ? '<comment>unknown</comment>' : "<info>$importerId</info>")." with source provider <info>$sourceProviderId</info> and source id <info>$sourceId</info>");
 
         $sourceId = Utils::parseSourceId($sourceId);
         $progress = new ProgressBar($output);
@@ -105,7 +105,7 @@ class ImportCommand extends ContainerAwareCommand
             /** @var ImportRun $importRun */
             $importRun = $event->getContext()->getRun();
             $stats = $importRun->getStatistics();
-            $processed = isset($stats['processed'])?$stats['processed']:0;
+            $processed = isset($stats['processed']) ? $stats['processed'] : 0;
             $max = $importRun->getInfo()['count'];
 
             if ($progress->getMaxSteps() != $max) {
@@ -126,7 +126,7 @@ class ImportCommand extends ContainerAwareCommand
 
         $progress->finish();
         $output->writeln('');
-        $output->writeln("<info>Import done</info>");
+        $output->writeln('<info>Import done</info>');
         $output->writeln('');
 
         $this->writeStatistics($importRun->getStatistics(), new Table($output));
@@ -153,7 +153,7 @@ class ImportCommand extends ContainerAwareCommand
         ;
 
         $tree = [];
-        foreach ($violations as $line=>$validations) {
+        foreach ($violations as $line => $validations) {
             /** @var ConstraintViolation $validation */
             foreach ($validations as $validation) {
                 $key = $validation->__toString();
@@ -165,8 +165,8 @@ class ImportCommand extends ContainerAwareCommand
         }
 
         $i = 0;
-        foreach ($tree as $violation=>$lines) {
-            $table->addRow([$violation, join(', ', Utils::numbersToRangeText($lines))]);
+        foreach ($tree as $violation => $lines) {
+            $table->addRow([$violation, implode(', ', Utils::numbersToRangeText($lines))]);
             ++$i;
 
             if ($i === self::MAX_VIOLATION_ERRORS) {
@@ -185,7 +185,7 @@ class ImportCommand extends ContainerAwareCommand
     protected function writeStatistics(array $statistics, Table $table)
     {
         $rows = [];
-        foreach ($statistics as $k=>$v) {
+        foreach ($statistics as $k => $v) {
             $rows[] = [$k, $v];
         }
 
@@ -195,5 +195,4 @@ class ImportCommand extends ContainerAwareCommand
         ;
         $table->render();
     }
-
 }

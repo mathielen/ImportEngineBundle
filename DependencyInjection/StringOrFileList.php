@@ -1,14 +1,14 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\DependencyInjection;
 
 use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 
 class StringOrFileList extends \ArrayObject
 {
-
     public function __construct(array $listOrStringsOrFiles)
     {
-        foreach ($listOrStringsOrFiles as $k=>&$v) {
+        foreach ($listOrStringsOrFiles as $k => &$v) {
             if (is_dir($v)) {
                 $iterator = new RecursiveDirectoryIterator($v, \FilesystemIterator::KEY_AS_PATHNAME);
                 $iterator = new \RecursiveIteratorIterator($iterator);
@@ -34,7 +34,7 @@ class StringOrFileList extends \ArrayObject
         //offset could be myfile.sql?targetconnection
         $url = parse_url($offset);
         $offset = $url['path'];
-        
+
         if (!parent::offsetExists($offset)) {
             throw new \InvalidArgumentException("Item with id '$offset' could not be found.");
         }
@@ -46,5 +46,4 @@ class StringOrFileList extends \ArrayObject
 
         return $v;
     }
-
 }

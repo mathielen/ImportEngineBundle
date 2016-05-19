@@ -1,4 +1,5 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\Command;
 
 use Mathielen\ImportEngine\Import\Import;
@@ -27,12 +28,12 @@ class GenerateImportValueObjectCommand extends ContainerAwareCommand
     {
         $this
             ->addArgument('source_id', InputArgument::REQUIRED, "Id of the demo-source. Different StorageProviders need different id-styles.\n- file/directory: \"<path/to/file>\"\n- doctrine: \"<id of query>\"\n- service: \"<service>.<method>[?arguments_like_url_query]\"")
-            ->addArgument('name', InputArgument::REQUIRED, "Classname of the valueobject that should be generated")
-            ->addArgument('path', InputArgument::REQUIRED, "Output directory for the class file")
+            ->addArgument('name', InputArgument::REQUIRED, 'Classname of the valueobject that should be generated')
+            ->addArgument('path', InputArgument::REQUIRED, 'Output directory for the class file')
             ->addOption('source_provider', null, InputOption::VALUE_OPTIONAL, 'Id of source provider. If not given it will be default', 'default')
-            ->addOption('format', null, InputOption::VALUE_OPTIONAL, "The format of the file (as a file extension). If not given it will be automatically determined.")
-            ->addOption('skip-field-format-discovery', null, InputOption::VALUE_NONE, "Do not scan source to determine the field-formats. Every fields will be assigned to the default-field-format")
-            ->addOption('default-field-format', null, InputOption::VALUE_OPTIONAL, "Default field format", 'string')
+            ->addOption('format', null, InputOption::VALUE_OPTIONAL, 'The format of the file (as a file extension). If not given it will be automatically determined.')
+            ->addOption('skip-field-format-discovery', null, InputOption::VALUE_NONE, 'Do not scan source to determine the field-formats. Every fields will be assigned to the default-field-format')
+            ->addOption('default-field-format', null, InputOption::VALUE_OPTIONAL, 'Default field format', 'string')
             ->setDescription('Generates a valueobject class file for use with the importengine.')
             ->setHelp(<<<EOT
 The <info>generate:import:valueobject</info> command helps you generates new <comment>valueobjects</comment>
@@ -80,7 +81,7 @@ EOT
         if (!$input->getOption('skip-field-format-discovery')) {
             $fieldDefinitions = $this->determineFieldDefinitions($storage, $defaultFieldFormat);
         } else {
-            $fieldDefinitions = array_change_key_case(array_fill_keys($storage->getFields(), array('type'=>$defaultFieldFormat)), CASE_LOWER);
+            $fieldDefinitions = array_change_key_case(array_fill_keys($storage->getFields(), array('type' => $defaultFieldFormat)), CASE_LOWER);
         }
 
         $voGenerator = new ValueObjectGenerator();
@@ -91,7 +92,7 @@ EOT
         $output->writeln("Valueobject class file has been generated and saved to <info>$filePath</info>");
     }
 
-    private function determineFieldDefinitions(StorageInterface $storage, $defaultFieldFormat='string')
+    private function determineFieldDefinitions(StorageInterface $storage, $defaultFieldFormat = 'string')
     {
         /** @var Importer $importer */
         $importer = $this->getContainer()->get('mathielen_importengine.generator.valueobject.importer');
@@ -106,5 +107,4 @@ EOT
 
         return $fieldformatguesser->getFieldDefinitionGuess($defaultFieldFormat);
     }
-
 }

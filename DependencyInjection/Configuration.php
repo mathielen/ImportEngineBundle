@@ -1,4 +1,5 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -6,7 +7,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-
     public function getConfigTreeBuilder()
     {
         $storageTypes = array('callable', 'service', 'array', 'doctrine', 'file');
@@ -35,7 +35,7 @@ class Configuration implements ConfigurationInterface
                                         ->fixXmlConfig('method') //allows <method> instead of <methods>
                                         ->beforeNormalization()
                                             ->ifArray()
-                                            ->then(function ($v) { return isset($v['methods'])||isset($v['method'])?$v:array('methods'=>$v); })
+                                            ->then(function ($v) { return isset($v['methods']) || isset($v['method']) ? $v : array('methods' => $v); })
                                         ->end()
                                         ->children()
                                             ->arrayNode('methods')
@@ -119,7 +119,7 @@ class Configuration implements ConfigurationInterface
                                     ->prototype('array')
                                         ->beforeNormalization()
                                             ->ifString()
-                                            ->then(function ($v) { return array('to'=>$v); })
+                                            ->then(function ($v) { return array('to' => $v); })
                                         ->end()
                                         ->children()
                                             ->scalarNode('to')->end()
@@ -138,7 +138,7 @@ class Configuration implements ConfigurationInterface
                                             ->fixXmlConfig('argument')
                                             ->beforeNormalization()
                                                 ->ifString()
-                                                ->then(function ($v) { return array('type'=>$v); })
+                                                ->then(function ($v) { return array('type' => $v); })
                                             ->end()
                                             ->children()
                                                 ->scalarNode('type')->isRequired()->end()
@@ -164,7 +164,7 @@ class Configuration implements ConfigurationInterface
                                             ->fixXmlConfig('constraint') //allows <constraint> instead of <constraints>
                                             ->beforeNormalization()
                                                 ->ifArray()
-                                                ->then(function ($v) { return isset($v['constraint'])||isset($v['constraints'])?$v:array('constraints'=>$v); })
+                                                ->then(function ($v) { return isset($v['constraint']) || isset($v['constraints']) ? $v : array('constraints' => $v); })
                                             ->end()
                                             ->children()
                                                 ->arrayNode('constraints')
@@ -177,7 +177,7 @@ class Configuration implements ConfigurationInterface
                                             ->fixXmlConfig('constraint') //allows <constraint> instead of <constraints>
                                             ->beforeNormalization()
                                                 ->ifArray()
-                                                ->then(function ($v) { return isset($v['constraint'])||isset($v['constraints'])?$v:array('constraints'=>$v); })
+                                                ->then(function ($v) { return isset($v['constraint']) || isset($v['constraints']) ? $v : array('constraints' => $v); })
                                             ->end()
                                             ->children()
                                                 ->arrayNode('constraints')
@@ -193,7 +193,7 @@ class Configuration implements ConfigurationInterface
                                     ->isRequired()
                                     ->beforeNormalization()
                                         ->always()
-                                        ->then(function ($v) { return !isset($v['type'])?['type'=>'callable', 'callable'=>$v]:$v; })
+                                        ->then(function ($v) { return !isset($v['type']) ? ['type' => 'callable', 'callable' => $v] : $v; })
                                     ->end()
                                     ->children()
                                         ->enumNode('type')
@@ -203,7 +203,7 @@ class Configuration implements ConfigurationInterface
                                             ->fixXmlConfig('argument')
                                             ->beforeNormalization()
                                                 ->ifString()
-                                                ->then(function ($v) { return ['type'=>$v]; })
+                                                ->then(function ($v) { return ['type' => $v]; })
                                             ->end()
                                             ->children()
                                                 ->scalarNode('type')->isRequired()->end()
@@ -226,5 +226,4 @@ class Configuration implements ConfigurationInterface
 
         return $treeBuilder;
     }
-
 }

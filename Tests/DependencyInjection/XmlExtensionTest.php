@@ -1,4 +1,5 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\Tests\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;

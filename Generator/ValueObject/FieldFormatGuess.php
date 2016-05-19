@@ -1,9 +1,9 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\Generator\ValueObject;
 
 class FieldFormatGuess
 {
-
     private $hasBlankValues = false;
 
     /**
@@ -56,8 +56,7 @@ class FieldFormatGuess
 
         return array(
             'empty' => $this->hasBlankValues,
-            'type' => $guessedType
+            'type' => $guessedType,
         );
     }
-
 }

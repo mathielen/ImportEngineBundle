@@ -1,4 +1,5 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\Expression;
 
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;

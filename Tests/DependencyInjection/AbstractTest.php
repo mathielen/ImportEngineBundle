@@ -1,4 +1,5 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\Tests\DependencyInjection;
 
 use Mathielen\ImportEngineBundle\DependencyInjection\MathielenImportEngineExtension;

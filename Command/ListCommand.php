@@ -1,4 +1,5 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\Command;
 
 use Mathielen\ImportEngine\Importer\ImporterRepository;
@@ -10,7 +11,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ListCommand extends ContainerAwareCommand
 {
-
     protected function configure()
     {
         $this->setName('importengine:list')
@@ -31,12 +31,11 @@ class ListCommand extends ContainerAwareCommand
 
             $table->addRow([
                 $importerId,
-                $importRepository->hasPrecondition($importerId)?'Yes':'No',
-                ($importer->validation() instanceof DummyValidation)?'No':'Yes'
+                $importRepository->hasPrecondition($importerId) ? 'Yes' : 'No',
+                ($importer->validation() instanceof DummyValidation) ? 'No' : 'Yes',
             ]);
         }
 
         $table->render();
     }
-
 }

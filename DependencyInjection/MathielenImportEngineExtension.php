@@ -1,4 +1,5 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\DependencyInjection;
 
 use Mathielen\ImportEngine\Exception\InvalidConfigurationException;
@@ -13,13 +14,12 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class MathielenImportEngineExtension extends Extension
 {
-
     public function load(array $configs, ContainerBuilder $container)
     {
         $config = $this->processConfiguration(new Configuration(), $configs);
 
         if (!empty($config['importers'])) {
-            $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+            $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
             $loader->load('services.xml');
 
             $this->parseConfig($config, $container);
@@ -48,7 +48,7 @@ class MathielenImportEngineExtension extends Extension
             $importerRepositoryDef->addMethodCall('register', array(
                 $name,
                 $this->generateImporterDef($importConfig, $objectFactoryDef),
-                $finderDef
+                $finderDef,
             ));
         }
     }
@@ -62,7 +62,7 @@ class MathielenImportEngineExtension extends Extension
         if ($config['type'] == 'jms_serializer') {
             return new Definition('Mathielen\DataImport\Writer\ObjectWriter\JmsSerializerObjectFactory', array(
                 $config['class'],
-                new Reference('jms_serializer')));
+                new Reference('jms_serializer'), ));
         }
 
         return new Definition('Mathielen\DataImport\Writer\ObjectWriter\DefaultObjectFactory', array($config['class']));
@@ -107,10 +107,10 @@ class MathielenImportEngineExtension extends Extension
     /**
      * @return \Symfony\Component\DependencyInjection\Definition
      */
-    private function generateImporterDef(array $importConfig, Definition $objectFactoryDef=null)
+    private function generateImporterDef(array $importConfig, Definition $objectFactoryDef = null)
     {
         $importerDef = new Definition('Mathielen\ImportEngine\Importer\Importer', array(
-            $this->getStorageDef($importConfig['target'], $objectFactoryDef)
+            $this->getStorageDef($importConfig['target'], $objectFactoryDef),
         ));
 
         if (isset($importConfig['source'])) {
@@ -135,7 +135,7 @@ class MathielenImportEngineExtension extends Extension
         //has static context?
         if (isset($importConfig['context'])) {
             $importerDef->addMethodCall('setContext', array(
-                $importConfig['context']
+                $importConfig['context'],
             ));
         }
 
@@ -148,12 +148,12 @@ class MathielenImportEngineExtension extends Extension
 
         foreach ($filtersOptions as $filtersOption) {
             $filtersDef->addMethodCall('add', array(
-                new Reference($filtersOption)
+                new Reference($filtersOption),
             ));
         }
 
         $importerDef->addMethodCall('filters', array(
-            $filtersDef
+            $filtersDef,
         ));
     }
 
@@ -162,7 +162,7 @@ class MathielenImportEngineExtension extends Extension
         $mappingsDef = new Definition('Mathielen\ImportEngine\Mapping\Mappings');
 
         //set converters
-        foreach ($mappingOptions as $field=>$fieldMapping) {
+        foreach ($mappingOptions as $field => $fieldMapping) {
             $converter = null;
             if (isset($fieldMapping['converter'])) {
                 $converter = $fieldMapping['converter'];
@@ -172,33 +172,33 @@ class MathielenImportEngineExtension extends Extension
                 $mappingsDef->addMethodCall('add', array(
                     $field,
                     $fieldMapping['to'],
-                    $converter
+                    $converter,
             ));
             } elseif ($converter) {
                 $mappingsDef->addMethodCall('setConverter', array(
                     $converter,
-                    $field
+                    $field,
                 ));
             }
         }
 
         $mappingFactoryDef = new Definition('Mathielen\ImportEngine\Mapping\DefaultMappingFactory', array(
-            $mappingsDef
+            $mappingsDef,
         ));
         $converterProviderDef = new Definition('Mathielen\ImportEngine\Mapping\Converter\Provider\ContainerAwareConverterProvider', array(
-            new Reference('service_container')
+            new Reference('service_container'),
         ));
 
         $transformerDef = new Definition('Mathielen\ImportEngine\Transformation\Transformation');
         $transformerDef->addMethodCall('setMappingFactory', array(
-            $mappingFactoryDef
+            $mappingFactoryDef,
         ));
         $transformerDef->addMethodCall('setConverterProvider', array(
-            $converterProviderDef
+            $converterProviderDef,
         ));
 
         $importerDef->addMethodCall('transformation', array(
-            $transformerDef
+            $transformerDef,
         ));
     }
 
@@ -208,34 +208,34 @@ class MathielenImportEngineExtension extends Extension
         $validatorFilterDef = new Definition('Mathielen\DataImport\Filter\ValidatorFilter', array(
             new Reference('validator'),
             $options,
-            new Reference('event_dispatcher')
+            new Reference('event_dispatcher'),
         ));
 
         return $validatorFilterDef;
     }
 
-    private function generateValidationDef(array $validationConfig, Definition $importerDef, Definition $objectFactoryDef=null)
+    private function generateValidationDef(array $validationConfig, Definition $importerDef, Definition $objectFactoryDef = null)
     {
         $validationDef = new Definition('Mathielen\ImportEngine\Validation\ValidatorValidation', array(
-            new Reference('validator')
+            new Reference('validator'),
         ));
         $importerDef->addMethodCall('validation', array(
-            $validationDef
+            $validationDef,
         ));
 
         $validatorFilterDef = $this->generateValidatorDef(
-            isset($validationConfig['options'])?$validationConfig['options']:array()
+            isset($validationConfig['options']) ? $validationConfig['options'] : array()
         );
 
         if (isset($validationConfig['source'])) {
             $validationDef->addMethodCall('setSourceValidatorFilter', array(
-                $validatorFilterDef
+                $validatorFilterDef,
             ));
 
-            foreach ($validationConfig['source']['constraints'] as $field=>$constraint) {
+            foreach ($validationConfig['source']['constraints'] as $field => $constraint) {
                 $validationDef->addMethodCall('addSourceConstraint', array(
                     $field,
-                    new Definition($constraint)
+                    new Definition($constraint),
                 ));
             }
         }
@@ -250,20 +250,19 @@ class MathielenImportEngineExtension extends Extension
                 $validatorFilterDef = new Definition('Mathielen\DataImport\Filter\ClassValidatorFilter', array(
                     new Reference('validator'),
                     $objectFactoryDef,
-                    new Reference('event_dispatcher')
+                    new Reference('event_dispatcher'),
                 ));
-
             } else {
-                foreach ($validationConfig['target']['constraints'] as $field=>$constraint) {
+                foreach ($validationConfig['target']['constraints'] as $field => $constraint) {
                     $validationDef->addMethodCall('addTargetConstraint', array(
                         $field,
-                        new Definition($constraint)
+                        new Definition($constraint),
                     ));
                 }
             }
 
             $validationDef->addMethodCall('setTargetValidatorFilter', array(
-                $validatorFilterDef
+                $validatorFilterDef,
             ));
         }
 
@@ -274,7 +273,7 @@ class MathielenImportEngineExtension extends Extension
     {
         $sDef = $this->getStorageDef($sourceConfig, $importerDef);
         $importerDef->addMethodCall('setSourceStorage', array(
-            $sDef
+            $sDef,
         ));
     }
 
@@ -283,65 +282,65 @@ class MathielenImportEngineExtension extends Extension
         $formatDiscoverLocalFileStorageFactoryDef = new Definition('Mathielen\ImportEngine\Storage\Factory\FormatDiscoverLocalFileStorageFactory', array(
             new Definition('Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy', array(
                 array(
-                    'text/plain'=>new Definition('Mathielen\ImportEngine\Storage\Format\Factory\CsvAutoDelimiterFormatFactory'),
-                    'text/csv'=>new Definition('Mathielen\ImportEngine\Storage\Format\Factory\CsvAutoDelimiterFormatFactory'),
-                )
+                    'text/plain' => new Definition('Mathielen\ImportEngine\Storage\Format\Factory\CsvAutoDelimiterFormatFactory'),
+                    'text/csv' => new Definition('Mathielen\ImportEngine\Storage\Format\Factory\CsvAutoDelimiterFormatFactory'),
+                ),
             )),
-            new Reference('logger')
+            new Reference('logger'),
         ));
 
         switch ($config['type']) {
             case 'directory':
                 $spFinderDef = new Definition('Symfony\Component\Finder\Finder');
                 $spFinderDef->addMethodCall('in', array(
-                    $config['uri']
+                    $config['uri'],
                 ));
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\FinderFileStorageProvider', array(
                     $spFinderDef,
-                    $formatDiscoverLocalFileStorageFactoryDef
+                    $formatDiscoverLocalFileStorageFactoryDef,
                 ));
                 break;
             case 'upload':
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\UploadFileStorageProvider', array(
                     $config['uri'],
-                    $formatDiscoverLocalFileStorageFactoryDef
+                    $formatDiscoverLocalFileStorageFactoryDef,
                 ));
                 break;
             case 'dbal':
                 $listResolverDef = new Definition(StringOrFileList::class, array($config['queries']));
                 if (!isset($config['connection_factory'])) {
-                    $connectionFactoryDef = new Definition(DefaultConnectionFactory::class, array(array('default'=>new Reference('doctrine.dbal.default_connection'))));
+                    $connectionFactoryDef = new Definition(DefaultConnectionFactory::class, array(array('default' => new Reference('doctrine.dbal.default_connection'))));
                 } else {
                     $connectionFactoryDef = new Reference($config['connection_factory']);
                 }
 
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\DbalStorageProvider', array(
                     $connectionFactoryDef,
-                    $listResolverDef
+                    $listResolverDef,
                 ));
                 break;
             case 'doctrine':
                 $listResolverDef = new Definition(StringOrFileList::class, array($config['queries']));
                 if (!isset($config['connection_factory'])) {
-                    $connectionFactoryDef = new Definition(DefaultConnectionFactory::class, array(array('default'=>new Reference('doctrine.orm.entity_manager'))));
+                    $connectionFactoryDef = new Definition(DefaultConnectionFactory::class, array(array('default' => new Reference('doctrine.orm.entity_manager'))));
                 } else {
                     $connectionFactoryDef = new Reference($config['connection_factory']);
                 }
 
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\DoctrineQueryStorageProvider', array(
                     $connectionFactoryDef,
-                    $listResolverDef
+                    $listResolverDef,
                 ));
                 break;
             case 'service':
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\ServiceStorageProvider', array(
                     new Reference('service_container'),
-                    $config['services']
+                    $config['services'],
                 ));
                 break;
             case 'file':
                 $spDef = new Definition('Mathielen\ImportEngine\Storage\Provider\FileStorageProvider', array(
-                    $formatDiscoverLocalFileStorageFactoryDef
+                    $formatDiscoverLocalFileStorageFactoryDef,
                 ));
                 break;
             default:
@@ -350,7 +349,7 @@ class MathielenImportEngineExtension extends Extension
 
         $storageLocatorDef->addMethodCall('register', array(
             $id,
-            $spDef
+            $spDef,
         ));
     }
 
@@ -361,14 +360,14 @@ class MathielenImportEngineExtension extends Extension
         }
 
         return new Definition('SplFileInfo', array(
-            $uri
+            $uri,
         ));
     }
 
     /**
      * @return Definition
      */
-    private function getStorageDef(array $config, Definition $objectFactoryDef=null)
+    private function getStorageDef(array $config, Definition $objectFactoryDef = null)
     {
         switch ($config['type']) {
             case 'file':
@@ -377,14 +376,14 @@ class MathielenImportEngineExtension extends Extension
                 $format = $config['format'];
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\LocalFileStorage', array(
                     $fileDef,
-                    new Definition('Mathielen\ImportEngine\Storage\Format\\'.ucfirst($format['type'])."Format", $format['arguments'])
+                    new Definition('Mathielen\ImportEngine\Storage\Format\\'.ucfirst($format['type']).'Format', $format['arguments']),
                 ));
 
                 break;
             case 'doctrine':
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\DoctrineStorage', array(
                     new Reference('doctrine.orm.entity_manager'),
-                    $config['entity']
+                    $config['entity'],
                 ));
 
                 break;
@@ -393,7 +392,7 @@ class MathielenImportEngineExtension extends Extension
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\ServiceStorage', array(
                     [new Reference($config['service']), $config['method']], //callable
                     [],
-                    $objectFactoryDef //from parameter array
+                    $objectFactoryDef, //from parameter array
                 ));
 
                 break;
@@ -402,7 +401,7 @@ class MathielenImportEngineExtension extends Extension
                 $storageDef = new Definition('Mathielen\ImportEngine\Storage\ServiceStorage', array(
                     $config['callable'],
                     [],
-                    $objectFactoryDef //from parameter array
+                    $objectFactoryDef, //from parameter array
                 ));
 
                 break;

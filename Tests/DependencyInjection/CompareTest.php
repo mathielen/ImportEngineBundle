@@ -1,4 +1,5 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\Tests\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
@@ -7,7 +8,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class CompareTest extends AbstractTest
 {
-
     private function getXmlDefinitions($filename)
     {
         $this->setUp();
@@ -40,7 +40,8 @@ class CompareTest extends AbstractTest
         $this->assertEquals($this->getYamlDefinitions('medium'), $this->getXmlDefinitions('medium'));
         $this->assertEquals($this->getYamlDefinitions('minimum'), $this->getXmlDefinitions('minimum'));
     }
-
 }
 
-class MyImportedRow {}
+class MyImportedRow
+{
+}

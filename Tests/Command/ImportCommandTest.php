@@ -1,4 +1,5 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle\Tests\Command;
 
 use Mathielen\ImportEngine\Event\ImportConfigureEvent;
@@ -15,7 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ImportCommandTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var ImportCommand
      */
@@ -60,7 +60,7 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
             ->withConsecutive(
                 array(
                     ImportConfigureEvent::AFTER_BUILD,
-                    $this->anything()
+                    $this->anything(),
                 )
             );
 
@@ -68,7 +68,7 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('run');
 
-        $input = new ArrayInput(array('--limit'=>1, '--importer'=>'abc', 'source_id'=>'source_id'), $this->command->getDefinition());
+        $input = new ArrayInput(array('--limit' => 1, '--importer' => 'abc', 'source_id' => 'source_id'), $this->command->getDefinition());
         $output = new TestOutput();
 
         $this->command->run($input, $output);
@@ -93,7 +93,7 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('dryrun');
 
-        $input = new ArrayInput(array('--dryrun'=>true, '--importer'=>'abc', 'source_id'=>'source_id'), $this->command->getDefinition());
+        $input = new ArrayInput(array('--dryrun' => true, '--importer' => 'abc', 'source_id' => 'source_id'), $this->command->getDefinition());
         $output = new TestOutput();
 
         $this->command->run($input, $output);
@@ -131,11 +131,10 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
     public function getRunData()
     {
         return array(
-            array(array('source_id'=>'source_id'), 'source_id'),
-            array(array('source_id'=>'service.method?arg1=abc'), array('service'=>'service', 'method'=>'method', 'arguments'=>array('arg1'=>'abc')))
+            array(array('source_id' => 'source_id'), 'source_id'),
+            array(array('source_id' => 'service.method?arg1=abc'), array('service' => 'service', 'method' => 'method', 'arguments' => array('arg1' => 'abc'))),
         );
     }
-
 }
 
 class TestOutput extends Output

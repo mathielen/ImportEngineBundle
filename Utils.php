@@ -1,9 +1,9 @@
 <?php
+
 namespace Mathielen\ImportEngineBundle;
 
 class Utils
 {
-
     /**
      * @return array
      */
@@ -18,12 +18,12 @@ class Utils
             }
             $pathTokens = explode('.', $parsedSourceId['path']);
             $method = array_pop($pathTokens);
-            $service = join('.', $pathTokens);
+            $service = implode('.', $pathTokens);
 
             return array(
                 'service' => $service,
                 'method' => $method,
-                'arguments' => isset($parsedSourceId['query'])?$parsedSourceId['query']:null
+                'arguments' => isset($parsedSourceId['query']) ? $parsedSourceId['query'] : null,
             );
         }
 
@@ -35,7 +35,7 @@ class Utils
      */
     public static function isWindows()
     {
-        return (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
+        return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
     }
 
     /**
@@ -43,7 +43,7 @@ class Utils
      */
     public static function isCli()
     {
-        return php_sapi_name() == "cli";
+        return php_sapi_name() == 'cli';
     }
 
     /**
@@ -52,7 +52,7 @@ class Utils
     public static function whoAmI()
     {
         if (self::isWindows()) {
-            $user = getenv("username");
+            $user = getenv('username');
         } else {
             $processUser = posix_getpwuid(posix_geteuid());
             $user = $processUser['name'];
@@ -75,7 +75,7 @@ class Utils
 
         $currentRange = [];
         foreach ($numbers as $number) {
-            if (!empty($currentRange) && current($currentRange) !== $number-1) {
+            if (!empty($currentRange) && current($currentRange) !== $number - 1) {
                 self::addRangeText($ranges, $currentRange);
 
                 $currentRange = [];
@@ -98,8 +98,7 @@ class Utils
             $ranges[] = $lastItem;
         } else {
             $firstItem = reset($currentRange);
-            $ranges[] = $firstItem . '-' . $lastItem;
+            $ranges[] = $firstItem.'-'.$lastItem;
         }
     }
-
 }
