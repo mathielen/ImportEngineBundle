@@ -235,7 +235,7 @@ class MathielenImportEngineExtension extends Extension
             foreach ($validationConfig['source']['constraints'] as $field => $constraint) {
                 $validationDef->addMethodCall('addSourceConstraint', array(
                     $field,
-                    new Definition($constraint),
+                    new Reference($constraint),
                 ));
             }
         }
@@ -256,7 +256,7 @@ class MathielenImportEngineExtension extends Extension
                 foreach ($validationConfig['target']['constraints'] as $field => $constraint) {
                     $validationDef->addMethodCall('addTargetConstraint', array(
                         $field,
-                        new Definition($constraint),
+                        new Reference($constraint),
                     ));
                 }
             }

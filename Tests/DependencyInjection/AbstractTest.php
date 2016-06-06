@@ -4,6 +4,9 @@ namespace Mathielen\ImportEngineBundle\Tests\DependencyInjection;
 
 use Mathielen\ImportEngineBundle\DependencyInjection\MathielenImportEngineExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Url;
 
 abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,6 +32,9 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         $this->container->set('logger', $this->getMock('Psr\Log\LoggerInterface'));
         $this->container->set('some.converter.serviceid', new MyDummyService());
         $this->container->set('some.other.converter.serviceid', new MyDummyService());
+        $this->container->set('email', new Email());
+        $this->container->set('url', new Url());
+        $this->container->set('notempty', new NotBlank());
     }
 }
 
