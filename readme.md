@@ -36,6 +36,12 @@ public function registerBundles()
 }
 ```
 
+If you want to make use of excel files, please also make sure to include phpoffice/phpexcel in your project:
+
+```bash
+$ composer require phpoffice/phpexcel
+```
+
 Configuration
 ------------
 Add your importer configurations in your `app/config/config.yml`.
