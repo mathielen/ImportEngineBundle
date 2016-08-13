@@ -46,9 +46,8 @@ class DoctrineEndpoint
     {
         $this->objectManager->flush();
     }
-    
+
     public function rollback()
     {
     }
-    
 }

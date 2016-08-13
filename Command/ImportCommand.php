@@ -3,6 +3,7 @@
 namespace Mathielen\ImportEngineBundle\Command;
 
 use Ddeboer\DataImport\Filter\OffsetFilter;
+use JMS\SecurityExtraBundle\Exception\InvalidArgumentException;
 use Mathielen\DataImport\Event\ImportItemEvent;
 use Mathielen\ImportEngine\Event\ImportConfigureEvent;
 use Mathielen\ImportEngine\Event\ImportRequestEvent;
@@ -30,7 +31,7 @@ class ImportCommand extends ContainerAwareCommand
     {
         $this->setName('importengine:import')
             ->setDescription('Imports data with a definied importer')
-            ->addArgument('source_id', InputArgument::REQUIRED, "id of source. Different StorageProviders need different id data.\n- upload, directory: \"<path/to/file>\"\n- doctrine: \"<id of query>\"\n- service: \"<service>.<method>[?arguments_like_url_query]\"")
+            ->addArgument('source_id', InputArgument::OPTIONAL, "id of source. Different StorageProviders need different id data.\n- upload, directory: \"<path/to/file>\"\n- doctrine: \"<id of query>\"\n- service: \"<service>.<method>[?arguments_like_url_query]\"")
             ->addArgument('source_provider', InputArgument::OPTIONAL, 'id of source provider', 'default')
             ->addOption('importer', 'i', InputOption::VALUE_REQUIRED, 'id/name of importer')
             ->addOption('context', 'c', InputOption::VALUE_REQUIRED, 'Supply optional context information to import. Supply key-value data in query style: key=value&otherkey=othervalue&...')
@@ -62,6 +63,10 @@ class ImportCommand extends ContainerAwareCommand
             }
         }
         $limit = $input->getOption('limit');
+
+        if (empty($importerId) && empty($sourceId)) {
+            throw new InvalidArgumentException('There must be at least an importerId with a configured source-definition given or a sourceId which can be automatically recognized by pre-conditions.');
+        }
 
         $this->import($output, $importerId, $sourceProviderId, $sourceId, $context, $limit, $isDryrun);
     }

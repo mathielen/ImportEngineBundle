@@ -20,6 +20,8 @@
         </service>
         <service id="mathielen_importengine.converter.fieldlowercase" class="Mathielen\DataImport\ItemConverter\FieldLowercaseConverter" />
         <service id="mathielen_importengine.converter.trim" class="Mathielen\DataImport\ItemConverter\TrimConverter" />
+        <service id="mathielen_importengine.converter.empty_to_null" class="Mathielen\DataImport\ItemConverter\EmptyToNullConverter" />
+        <service id="mathielen_importengine.filter.empty_row" class="Mathielen\DataImport\Filter\EmptyRowFilter" />
 
 		<service id="mathielen_importengine.importer.format_discoverer" class="Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy" />
 
