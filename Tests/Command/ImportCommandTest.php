@@ -31,7 +31,7 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
         $ib = $this->getMockBuilder('Mathielen\ImportEngine\Import\ImportBuilder')->disableOriginalConstructor()->getMock();
 
         $this->container = new ContainerBuilder();
-        $this->container->set('event_dispatcher', $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
+        $this->container->set('event_dispatcher', $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
         $this->container->set('mathielen_importengine.import.builder', $ib);
         $this->container->set('mathielen_importengine.import.runner', $this->getMockBuilder('Mathielen\ImportEngine\Import\Run\ImportRunner')->disableOriginalConstructor()->getMock());
 
@@ -47,9 +47,9 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(
                 new Import(
                     new Importer(
-                        $this->getMock('Mathielen\ImportEngine\Storage\StorageInterface')
+                        $this->createMock('Mathielen\ImportEngine\Storage\StorageInterface')
                     ),
-                    $this->getMock('Mathielen\ImportEngine\Storage\StorageInterface'),
+                    $this->createMock('Mathielen\ImportEngine\Storage\StorageInterface'),
                     new ImportRun(new ImportConfiguration())
                 )
             ));
@@ -82,9 +82,9 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(
                 new Import(
                     new Importer(
-                        $this->getMock('Mathielen\ImportEngine\Storage\StorageInterface')
+                        $this->createMock('Mathielen\ImportEngine\Storage\StorageInterface')
                     ),
-                    $this->getMock('Mathielen\ImportEngine\Storage\StorageInterface'),
+                    $this->createMock('Mathielen\ImportEngine\Storage\StorageInterface'),
                     new ImportRun(new ImportConfiguration())
                 )
             ));
@@ -111,9 +111,9 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(
                 new Import(
                     new Importer(
-                        $this->getMock('Mathielen\ImportEngine\Storage\StorageInterface')
+                        $this->createMock('Mathielen\ImportEngine\Storage\StorageInterface')
                     ),
-                    $this->getMock('Mathielen\ImportEngine\Storage\StorageInterface'),
+                    $this->createMock('Mathielen\ImportEngine\Storage\StorageInterface'),
                     new ImportRun(new ImportConfiguration())
                 )
             ));
