@@ -18,7 +18,12 @@
         <service id="mathielen_importengine.converter.contextmerge" class="Mathielen\DataImport\ItemConverter\ContextMergeConverter">
             <tag name="kernel.event_subscriber" />
         </service>
-        <service id="mathielen_importengine.converter.fieldlowercase" class="Mathielen\DataImport\ItemConverter\FieldLowercaseConverter" />
+        <service id="mathielen_importengine.converter.key_lowercase" class="Mathielen\DataImport\ItemConverter\FieldCaseConverter">
+            <argument type="constant">CASE_LOWER</argument>
+        </service>
+        <service id="mathielen_importengine.converter.key_uppercase" class="Mathielen\DataImport\ItemConverter\FieldCaseConverter">
+            <argument type="constant">CASE_UPPER</argument>
+        </service>
         <service id="mathielen_importengine.converter.trim" class="Mathielen\DataImport\ItemConverter\TrimConverter" />
         <service id="mathielen_importengine.converter.empty_to_null" class="Mathielen\DataImport\ItemConverter\EmptyToNullConverter" />
         <service id="mathielen_importengine.filter.empty_row" class="Mathielen\DataImport\Filter\EmptyRowFilter" />
