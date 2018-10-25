@@ -3,7 +3,6 @@
 namespace Mathielen\ImportEngineBundle\Command;
 
 use Ddeboer\DataImport\Filter\OffsetFilter;
-use JMS\SecurityExtraBundle\Exception\InvalidArgumentException;
 use Mathielen\DataImport\Event\ImportItemEvent;
 use Mathielen\ImportEngine\Event\ImportConfigureEvent;
 use Mathielen\ImportEngine\Event\ImportRequestEvent;
@@ -65,7 +64,7 @@ class ImportCommand extends ContainerAwareCommand
         $limit = $input->getOption('limit');
 
         if (empty($importerId) && empty($sourceId)) {
-            throw new InvalidArgumentException('There must be at least an importerId with a configured source-definition given or a sourceId which can be automatically recognized by pre-conditions.');
+            throw new \InvalidArgumentException('There must be at least an importerId with a configured source-definition given or a sourceId which can be automatically recognized by pre-conditions.');
         }
 
         $this->import($output, $importerId, $sourceProviderId, $sourceId, $context, $limit, $isDryrun);
