@@ -9,7 +9,9 @@ class StringOrFileList extends \ArrayObject
     public function __construct(array $listOrStringsOrFiles)
     {
         foreach ($listOrStringsOrFiles as $k => &$v) {
-            if (is_dir($v)) {
+            if (filter_var($v, FILTER_VALIDATE_URL)) {
+                //nothing
+            } elseif (is_dir($v)) {
                 $iterator = new RecursiveDirectoryIterator($v, \FilesystemIterator::KEY_AS_PATHNAME);
                 $iterator = new \RecursiveIteratorIterator($iterator);
 
@@ -23,6 +25,8 @@ class StringOrFileList extends \ArrayObject
                 unset($listOrStringsOrFiles[$k]);
             } elseif (is_file($v)) {
                 $v = new \SplFileInfo($v);
+            } else {
+                throw new \RuntimeException("Unknown value type $v");
             }
         }
 
@@ -36,7 +40,7 @@ class StringOrFileList extends \ArrayObject
         $offset = $url['path'];
 
         if (!parent::offsetExists($offset)) {
-            throw new \InvalidArgumentException("Item with id '$offset' could not be found.");
+            return $this->checkStreamWrapper($offset);
         }
 
         $v = parent::offsetGet($offset);
@@ -45,5 +49,20 @@ class StringOrFileList extends \ArrayObject
         }
 
         return $v;
+    }
+
+    private function checkStreamWrapper($offset)
+    {
+        foreach ($this as $k => &$v) {
+            if (filter_var($v, FILTER_VALIDATE_URL)) {
+                $path = $v.'/'.$offset;
+
+                if (file_exists($path)) {
+                    return file_get_contents($path);
+                }
+            }
+        }
+
+        throw new \InvalidArgumentException("Item with id '$offset' could not be found.");
     }
 }
