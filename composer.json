@@ -17,15 +17,14 @@
   "require": {
     "php": ">=5.5.0",
     "mathielen/import-engine": ">=0.8.6",
-    "symfony/framework-bundle": "~2.4|~3.0"
+    "symfony/framework-bundle": "*"
   },
   "require-dev": {
-    "symfony/console": "~2.8|~3.0",
-    "symfony/validator": "~2.8|~3.0",
+    "symfony/console": "*",
+    "symfony/validator": "*",
     "phpunit/phpunit": "*",
-    "sensio/generator-bundle": "~2.3",
-    "jms/serializer": "~1.4",
-    "doctrine/orm": "~2.5"
+    "jms/serializer": "*",
+    "doctrine/orm": "*"
   },
   "suggest": {
     "symfony/console": "If you want to use the Commands",
