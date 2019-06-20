@@ -6,13 +6,12 @@ use Ddeboer\DataImport\Filter\OffsetFilter;
 use Mathielen\DataImport\Event\ImportItemEvent;
 use Mathielen\ImportEngine\Event\ImportConfigureEvent;
 use Mathielen\ImportEngine\Event\ImportRequestEvent;
-use Mathielen\ImportEngine\Exception\InvalidConfigurationException;
 use Mathielen\ImportEngine\Import\ImportBuilder;
 use Mathielen\ImportEngine\Import\Run\ImportRunner;
 use Mathielen\ImportEngine\ValueObject\ImportRequest;
 use Mathielen\ImportEngine\ValueObject\ImportRun;
 use Mathielen\ImportEngineBundle\Utils;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -20,15 +19,43 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 
-class ImportCommand extends ContainerAwareCommand
+class ImportCommand extends Command
 {
     const MAX_VIOLATION_ERRORS = 10;
 
+    /**
+     * @var ImportBuilder
+     */
+    private $importBuilder;
+
+    /**
+     * @var ImportRunner
+     */
+    private $importRunner;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    public function __construct(
+        ImportBuilder $importBuilder,
+        ImportRunner $importRunner,
+        EventDispatcherInterface $eventDispatcher)
+    {
+        parent::__construct('importengine:import');
+
+        $this->importBuilder = $importBuilder;
+        $this->importRunner = $importRunner;
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
     protected function configure()
     {
-        $this->setName('importengine:import')
+        $this
             ->setDescription('Imports data with a definied importer')
             ->addArgument('source_id', InputArgument::OPTIONAL, "id of source. Different StorageProviders need different id data.\n- upload, directory: \"<path/to/file>\"\n- doctrine: \"<id of query>\"\n- service: \"<service>.<method>[?arguments_like_url_query]\"")
             ->addArgument('source_provider', InputArgument::OPTIONAL, 'id of source provider', 'default')
@@ -39,18 +66,8 @@ class ImportCommand extends ContainerAwareCommand
         ;
     }
 
-    protected function validateInput(InputInterface $input)
-    {
-        if (!$this->getContainer()->has('mathielen_importengine.import.builder') ||
-            !$this->getContainer()->has('mathielen_importengine.import.runner')) {
-            throw new InvalidConfigurationException('No importengine services have been found. Did you register the bundle in AppKernel and configured at least one importer in config?');
-        }
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->validateInput($input);
-
         $importerId = $input->getOption('importer');
         $sourceProviderId = $input->getArgument('source_provider');
         $sourceId = $input->getArgument('source_id');
@@ -81,31 +98,28 @@ class ImportCommand extends ContainerAwareCommand
         if ($limit) {
             $output->writeln("Limiting import to <info>$limit</info> rows.");
 
-            $this->getContainer()->get('event_dispatcher')->addListener(ImportConfigureEvent::AFTER_BUILD, function (ImportConfigureEvent $event) use ($limit) {
+            $this->eventDispatcher->addListener(ImportConfigureEvent::AFTER_BUILD, function (ImportConfigureEvent $event) use ($limit) {
                 $event->getImport()->importer()->filters()->add(new OffsetFilter(0, $limit));
             });
         }
 
         //show discovered importer id
         if (empty($importerId)) {
-            $this->getContainer()->get('event_dispatcher')->addListener(ImportRequestEvent::DISCOVERED, function (ImportRequestEvent $event) use ($output) {
+            $this->eventDispatcher->addListener(ImportRequestEvent::DISCOVERED, function (ImportRequestEvent $event) use ($output) {
                 $importerId = $event->getImportRequest()->getImporterId();
                 $output->writeln("Importer discovered: <info>$importerId</info>");
             });
         }
 
-        /** @var ImportBuilder $importBuilder */
-        $importBuilder = $this->getContainer()->get('mathielen_importengine.import.builder');
+        $importRequest = new ImportRequest($sourceId, $sourceProviderId, $importerId, Utils::whoAmI().'@CLI');
 
-        $importRequest = new ImportRequest($sourceId, $sourceProviderId, $importerId, Utils::whoAmI().'@CLI', $context);
-
-        $import = $importBuilder->buildFromRequest($importRequest);
+        $import = $this->importBuilder->buildFromRequest($importRequest);
 
         //apply context info from commandline
         $importRun = $import->getRun();
 
         //status callback
-        $this->getContainer()->get('event_dispatcher')->addListener(ImportItemEvent::AFTER_READ, function (ImportItemEvent $event) use ($output, &$progress) {
+        $this->eventDispatcher->addListener(ImportItemEvent::AFTER_READ, function (ImportItemEvent $event) use ($output, &$progress) {
             /** @var ImportRun $importRun */
             $importRun = $event->getContext()->getRun();
             $stats = $importRun->getStatistics();
@@ -120,12 +134,10 @@ class ImportCommand extends ContainerAwareCommand
             $progress->setProgress($processed);
         });
 
-        /** @var ImportRunner $importRunner */
-        $importRunner = $this->getContainer()->get('mathielen_importengine.import.runner');
         if ($isDryrun) {
-            $importRunner->dryRun($import);
+            $this->importRunner->dryRun($import);
         } else {
-            $importRunner->run($import);
+            $this->importRunner->run($import);
         }
 
         $progress->finish();

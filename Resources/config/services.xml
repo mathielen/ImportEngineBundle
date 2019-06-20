@@ -6,6 +6,20 @@
 
 	<services>
 
+        <service id="mathielen_importengine.command.import" class="Mathielen\ImportEngineBundle\Command\ImportCommand">
+            <argument type="service" id="mathielen_importengine.import.builder" />
+            <argument type="service" id="mathielen_importengine.import.runner" />
+            <argument type="service" id="event_dispatcher" />
+
+            <tag name="console.command" />
+        </service>
+
+        <service id="mathielen_importengine.command.list" class="Mathielen\ImportEngineBundle\Command\ListCommand">
+            <argument type="service" id="mathielen_importengine.importer.repository" />
+
+            <tag name="console.command" />
+        </service>
+
         <service id="mathielen_importengine.converter.genericdate" class="Mathielen\DataImport\ValueConverter\GenericDateItemConverter">
             <argument>Y-m-d</argument>
         </service>
