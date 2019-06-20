@@ -4,7 +4,6 @@ namespace Mathielen\ImportEngineBundle\Command;
 
 use Mathielen\ImportEngine\Importer\ImporterRepository;
 use Mathielen\ImportEngine\Validation\DummyValidation;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
