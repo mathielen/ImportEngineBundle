@@ -111,7 +111,7 @@ class ImportCommand extends Command
             });
         }
 
-        $importRequest = new ImportRequest($sourceId, $sourceProviderId, $importerId, Utils::whoAmI().'@CLI');
+        $importRequest = new ImportRequest($sourceId, $sourceProviderId, $importerId, Utils::whoAmI().'@CLI', $context);
 
         $import = $this->importBuilder->buildFromRequest($importRequest);
 
