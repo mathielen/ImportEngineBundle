@@ -63,6 +63,7 @@ class ImportCommand extends Command
             ->addOption('context', 'c', InputOption::VALUE_REQUIRED, 'Supply optional context information to import. Supply key-value data in query style: key=value&otherkey=othervalue&...')
             ->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit imported rows')
             ->addOption('dryrun', 'd', InputOption::VALUE_NONE, 'Do not import - Validation only')
+            ->addOption('validate-and-run', null, InputOption::VALUE_NONE, 'Validate and run if no error')
         ;
     }
 
@@ -72,6 +73,11 @@ class ImportCommand extends Command
         $sourceProviderId = $input->getArgument('source_provider');
         $sourceId = $input->getArgument('source_id');
         $isDryrun = $input->getOption('dryrun');
+        $isValidateAndRun = $input->getOption('validate-and-run');
+        if ($isDryrun && $isValidateAndRun) {
+            throw new \InvalidArgumentException("Cannot invoke with dryrun and validate-and-run");
+        }
+        $runMode = $isDryrun ? 'dryrun' : $isValidateAndRun ? 'validate_and_run' : 'run';
         if ($context = $input->getOption('context')) {
             //parse key=value&key=value string to array
             if (strpos($context, '=') !== false) {
@@ -84,12 +90,12 @@ class ImportCommand extends Command
             throw new \InvalidArgumentException('There must be at least an importerId with a configured source-definition given or a sourceId which can be automatically recognized by pre-conditions.');
         }
 
-        $this->import($output, $importerId, $sourceProviderId, $sourceId, $context, $limit, $isDryrun);
+        $this->import($output, $importerId, $sourceProviderId, $sourceId, $context, $limit, $runMode);
     }
 
-    protected function import(OutputInterface $output, $importerId, $sourceProviderId, $sourceId, $context = null, $limit = null, $isDryrun = false)
+    protected function import(OutputInterface $output, $importerId, $sourceProviderId, $sourceId, $context = null, $limit = null, $runMode = 'run')
     {
-        $output->writeln('Commencing '.($isDryrun ? '<comment>dry-run</comment> ' : '').'import using importer '.(empty($importerId) ? '<comment>unknown</comment>' : "<info>$importerId</info>")." with source provider <info>$sourceProviderId</info> and source id <info>$sourceId</info>");
+        $output->writeln("Commencing import with mode <comment>$runMode</comment> using importer ".(empty($importerId) ? '<comment>unknown</comment>' : "<info>$importerId</info>")." with source provider <info>$sourceProviderId</info> and source id <info>$sourceId</info>");
 
         $sourceId = Utils::parseSourceId($sourceId);
         $progress = new ProgressBar($output);
@@ -134,8 +140,11 @@ class ImportCommand extends Command
             $progress->setProgress($processed);
         });
 
-        if ($isDryrun) {
+        if ($runMode === 'dryrun') {
             $this->importRunner->dryRun($import);
+        } elseif ($runMode === 'validate_and_run') {
+            $this->importRunner->dryRun($import);
+            $this->importRunner->run($import);
         } else {
             $this->importRunner->run($import);
         }
