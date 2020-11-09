@@ -16,8 +16,7 @@
   ],
   "require": {
     "php": ">=5.5.0",
-    "mathielen/import-engine": "dev-master",
-    "symfony/framework-bundle": "*"
+    "mathielen/import-engine": "dev-master"
   },
   "require-dev": {
     "symfony/console": "*",
