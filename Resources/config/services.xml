@@ -20,29 +20,29 @@
             <tag name="console.command" />
         </service>
 
-        <service id="mathielen_importengine.converter.genericdate" class="Mathielen\DataImport\ValueConverter\GenericDateItemConverter">
+        <service id="mathielen_importengine.converter.genericdate" class="Mathielen\DataImport\ValueConverter\GenericDateItemConverter" public="true">
             <argument>Y-m-d</argument>
         </service>
-        <service id="mathielen_importengine.converter.excel.genericdate" class="Mathielen\DataImport\ValueConverter\ExcelGenericDateItemConverter">
+        <service id="mathielen_importengine.converter.excel.genericdate" class="Mathielen\DataImport\ValueConverter\ExcelGenericDateItemConverter" public="true">
             <argument>Y-m-d</argument>
         </service>
-        <service id="mathielen_importengine.converter.contextsupply" class="Mathielen\DataImport\ItemConverter\ContextSupplyConverter">
+        <service id="mathielen_importengine.converter.contextsupply" class="Mathielen\DataImport\ItemConverter\ContextSupplyConverter" public="true">
             <tag name="kernel.event_subscriber" />
         </service>
-        <service id="mathielen_importengine.converter.contextmerge" class="Mathielen\DataImport\ItemConverter\ContextMergeConverter">
+        <service id="mathielen_importengine.converter.contextmerge" class="Mathielen\DataImport\ItemConverter\ContextMergeConverter" public="true">
             <tag name="kernel.event_subscriber" />
         </service>
-        <service id="mathielen_importengine.converter.key_lowercase" class="Mathielen\DataImport\ItemConverter\FieldCaseConverter">
+        <service id="mathielen_importengine.converter.key_lowercase" class="Mathielen\DataImport\ItemConverter\FieldCaseConverter" public="true">
             <argument type="constant">CASE_LOWER</argument>
         </service>
-        <service id="mathielen_importengine.converter.key_uppercase" class="Mathielen\DataImport\ItemConverter\FieldCaseConverter">
+        <service id="mathielen_importengine.converter.key_uppercase" class="Mathielen\DataImport\ItemConverter\FieldCaseConverter" public="true">
             <argument type="constant">CASE_UPPER</argument>
         </service>
-        <service id="mathielen_importengine.converter.trim" class="Mathielen\DataImport\ItemConverter\TrimConverter" />
-        <service id="mathielen_importengine.converter.empty_to_null" class="Mathielen\DataImport\ItemConverter\EmptyToNullConverter" />
-        <service id="mathielen_importengine.filter.empty_row" class="Mathielen\DataImport\Filter\EmptyRowFilter" />
+        <service id="mathielen_importengine.converter.trim" class="Mathielen\DataImport\ItemConverter\TrimConverter" public="true"/>
+        <service id="mathielen_importengine.converter.empty_to_null" class="Mathielen\DataImport\ItemConverter\EmptyToNullConverter" public="true"/>
+        <service id="mathielen_importengine.filter.empty_row" class="Mathielen\DataImport\Filter\EmptyRowFilter" public="true"/>
 
-		<service id="mathielen_importengine.importer.format_discoverer" class="Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy" />
+		<service id="mathielen_importengine.importer.format_discoverer" class="Mathielen\ImportEngine\Storage\Format\Discovery\MimeTypeDiscoverStrategy"  public="true" />
 
 		<service id="mathielen_importengine.importer.repository" class="Mathielen\ImportEngine\Importer\ImporterRepository">
             <argument type="service" id="logger" />
