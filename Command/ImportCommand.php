@@ -77,7 +77,7 @@ class ImportCommand extends Command
         if ($isDryrun && $isValidateAndRun) {
             throw new \InvalidArgumentException("Cannot invoke with dryrun and validate-and-run");
         }
-        $runMode = $isDryrun ? 'dryrun' : $isValidateAndRun ? 'validate_and_run' : 'run';
+        $runMode = $isDryrun ? 'dryrun' : ($isValidateAndRun ? 'validate_and_run' : 'run');
         if ($context = $input->getOption('context')) {
             //parse key=value&key=value string to array
             if (strpos($context, '=') !== false) {
